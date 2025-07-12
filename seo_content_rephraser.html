@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Content Rephraser with Keyword Optimizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #a0a0a0;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: #333;
+        }
+
+        .section h2 {
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #0f3460;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0f3460;
+        }
+
+        .form-group textarea {
+            height: 200px;
+            resize: vertical;
+        }
+
+        .keyword-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .chip {
+            background: #0f3460;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chip .remove {
+            cursor: pointer;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .density-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .density-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .density-info.warning {
+            margin-bottom: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+        }
+
+        .density-info.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+
+        .density-info.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .output-section {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .output-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #0f3460;
+            margin: 15px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .suggestions {
+            margin-top: 20px;
+        }
+
+        .suggestion-item {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .suggestion-item h4 {
+            color: #1976d2;
+            margin-bottom: 5px;
+        }
+
+        .upload-area {
+            border: 2px dashed #0f3460;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background-color: #f8f9fa;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-label {
+            cursor: pointer;
+            font-size: 16px;
+            color: #0f3460;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .density-settings {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SEO Content Rephraser</h1>
+            <p>Professional Keyword Optimizer & Content Structure Generator</p>
+        </div>
+
+        <div class="main-content">
+            <div class="section">
+                <h2>Content Input</h2>
+                
+                <div class="upload-area">
+                    <input type="file" id="fileInput" accept=".docx,.pdf,.txt">
+                    <label for="fileInput" class="upload-label">
+                        📁 Upload Document (Word, PDF, or Text)
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="originalContent">Original Content (minimum 100 words):</label>
+                    <textarea id="originalContent" placeholder="Paste your content here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="mainKeyword">Main Keyword:</label>
+                    <input type="text" id="mainKeyword" placeholder="Enter your main keyword">
+                </div>
+
+                <div class="form-group">
+                    <label for="secondaryKeywords">Secondary Keywords:</label>
+                    <input type="text" id="secondaryKeywords" placeholder="Type keyword and press Enter">
+                    <div class="keyword-chips" id="keywordChips"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Keyword Density Settings</h2>
+                
+                <div class="density-settings">
+                    <div class="form-group">
+                        <label for="minFreq">Minimum Frequency:</label>
+                        <input type="number" id="minFreq" value="3" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="maxFreq">Maximum Frequency:</label>
+                        <input type="number" id="maxFreq" value="10" min="1">
+                    </div>
+                </div>
+
+                <div class="density-info" id="densityInfo">
+                    <strong>Keyword Density Analysis:</strong>
+                    <p>Enter content and main keyword to see analysis</p>
+                </div>
+
+                <button class="btn btn-primary" onclick="analyzeContent()">Analyze Content</button>
+                <button class="btn btn-success" onclick="rephraseContent()">Rephrase Content</button>
+            </div>
+        </div>
+
+        <div class="output-section full-width" id="outputSection" style="display: none;">
+            <h2>Rephrased Content & Analysis</h2>
+            
+            <div class="stats" id="contentStats"></div>
+            
+            <div class="output-content" id="rephrasedContent"></div>
+            
+            <div class="suggestions" id="contentSuggestions"></div>
+            
+            <div style="margin-top: 20px;">
+                <button class="btn btn-info" onclick="downloadWord()">📄 Download Word</button>
+                <button class="btn btn-info" onclick="downloadPDF()">📄 Download PDF</button>
+                <button class="btn btn-primary" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let secondaryKeywordsList = [];
+        let rephrasedContentText = '';
+
+        // File upload handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    document.getElementById('originalContent').value = content;
+                    showNotification('File uploaded successfully!', 'success');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Secondary keywords handler
+        document.getElementById('secondaryKeywords').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const keyword = this.value.trim();
+                if (keyword && !secondaryKeywordsList.includes(keyword)) {
+                    secondaryKeywordsList.push(keyword);
+                    updateKeywordChips();
+                    this.value = '';
+                }
+            }
+        });
+
+        function updateKeywordChips() {
+            const chipsContainer = document.getElementById('keywordChips');
+            chipsContainer.innerHTML = '';
+            
+            secondaryKeywordsList.forEach((keyword, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.innerHTML = `
+                    ${keyword}
+                    <span class="remove" onclick="removeKeyword(${index})">×</span>
+                `;
+                chipsContainer.appendChild(chip);
+            });
+        }
+
+        function removeKeyword(index) {
+            secondaryKeywordsList.splice(index, 1);
+            updateKeywordChips();
+        }
+
+        function analyzeContent() {
+            const content = document.getElementById('originalContent').value;
+            const mainKeyword = document.getElementById('mainKeyword').value;
+            
+            if (!content || !mainKeyword) {
+                showNotification('Please enter content and main keyword', 'error');
+                return;
+            }
+
+            if (content.split(' ').length < 100) {
+                showNotification('Content should be at least 100 words', 'error');
+                return;
+            }
+
+            const analysis = calculateKeywordDensity(content, mainKeyword);
+            displayDensityAnalysis(analysis);
+            showNotification('Content analyzed successfully!', 'success');
+        }
+
+        function calculateKeywordDensity(content, keyword) {
+            const words = content.toLowerCase().split(/\s+/);
+            const keywordCount = words.filter(word => word.includes(keyword.toLowerCase())).length;
+            const totalWords = words.length;
+            const density = ((keywordCount / totalWords) * 100).toFixed(2);
+            
+            const minFreq = parseInt(document.getElementById('minFreq').value);
+            const maxFreq = parseInt(document.getElementById('maxFreq').value);
+            
+            let status = 'optimal';
+            if (keywordCount < minFreq) status = 'low';
+            if (keywordCount > maxFreq) status = 'high';
+            
+            return {
+                keywordCount,
+                totalWords,
+                density,
+                status,
+                minFreq,
+                maxFreq
+            };
+        }
+
+        function displayDensityAnalysis(analysis) {
+            const densityInfo = document.getElementById('densityInfo');
+            let className = 'density-info';
+            let message = '';
+
+            if (analysis.status === 'low') {
+                className += ' warning';
+                message = `⚠️ Keyword density is low (${analysis.density}%). Consider adding more instances of your main keyword.`;
+            } else if (analysis.status === 'high') {
+                className += ' error';
+                message = `❌ Keyword density is high (${analysis.density}%). Risk of keyword stuffing. Consider reducing keyword usage.`;
+            } else {
+                className += ' success';
+                message = `✅ Keyword density is optimal (${analysis.density}%). Good SEO balance achieved.`;
+            }
+
+            densityInfo.className = className;
+            densityInfo.innerHTML = `
+                <strong>Keyword Density Analysis:</strong>
+                <p>${message}</p>
+                <p>Keyword appears ${analysis.keywordCount} times out of ${analysis.totalWords} words</p>
+                <p>Target range: ${analysis.minFreq}-${analysis.maxFreq} occurrences</p>
+            `;
+        }
+
+        function rephraseContent() {
+            const content = document.getElementById('originalContent').value;
+            const mainKeyword = document.getElementById('mainKeyword').value;
+            
+            if (!content || !mainKeyword) {
+                showNotification('Please enter content and main keyword', 'error');
+                return;
+            }
+
+            if (content.split(' ').length < 100) {
+                showNotification('Content should be at least 100 words', 'error');
+                return;
+            }
+
+            // Simulate content rephrasing with keyword optimization
+            rephrasedContentText = simulateContentRephrasing(content, mainKeyword, secondaryKeywordsList);
+            displayRephrasedContent(rephrasedContentText);
+            document.getElementById('outputSection').style.display = 'block';
+            showNotification('Content rephrased successfully!', 'success');
+        }
+
+        function simulateContentRephrasing(content, mainKeyword, secondaryKeywords) {
+            // Generate structured content with proper headings, paragraphs, tables, and FAQs
+            const sentences = content.split(/[.!?]+/).filter(s => s.trim());
+            const minFreq = parseInt(document.getElementById('minFreq').value);
+            
+            // Create structured content sections
+            const structuredContent = generateStructuredContent(content, mainKeyword, secondaryKeywords, sentences);
+            
+            return structuredContent;
+        }
+
+        function generateStructuredContent(originalContent, mainKeyword, secondaryKeywords, sentences) {
+            const today = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Process sentences for better readability
+            let processedSentences = sentences.map(sentence => {
+                let newSentence = sentence.trim();
+                
+                // Add variations and synonyms
+                newSentence = newSentence.replace(/\b(good|great|excellent)\b/gi, match => {
+                    const alternatives = ['outstanding', 'remarkable', 'exceptional', 'superior'];
+                    return alternatives[Math.floor(Math.random() * alternatives.length)];
+                });
+                
+                newSentence = newSentence.replace(/\b(important|crucial|vital)\b/gi, match => {
+                    const alternatives = ['essential', 'significant', 'critical', 'fundamental'];
+                    return alternatives[Math.floor(Math.random() * alternatives.length)];
+                });
+                
+                return newSentence;
+            });
+
+            // Generate structured content
+            const structuredContent = `
+# ${mainKeyword}: Complete Guide and Analysis
+
+*Published: ${today}*
+
+## Overview
+
+${processedSentences.slice(0, 2).join('. ')}. This comprehensive guide explores **${mainKeyword}** in detail, providing valuable insights for readers seeking to understand this topic thoroughly.
+
+## H2: Understanding ${mainKeyword}
+
+### Key Concepts
+
+${processedSentences.slice(2, 4).join('. ')}. When working with **${mainKeyword}**, it's essential to grasp these fundamental principles that form the foundation of successful implementation.
+
+### Why ${mainKeyword} Matters
+
+${processedSentences.slice(4, 6).join('. ')}. The significance of **${mainKeyword}** cannot be overstated in today's competitive landscape.
+
+## H2: ${mainKeyword} vs Alternatives
+
+### Comparative Analysis
+
+${processedSentences.slice(6, 8).join('. ')}. Understanding how **${mainKeyword}** compares to other solutions helps in making informed decisions.
+
+### Key Differences
+
+| Feature | ${mainKeyword} | Alternative Solutions |
+|---------|----------------|----------------------|
+| **Efficiency** | High performance optimization | Standard performance |
+| **Cost** | Cost-effective solution | Variable pricing |
+| **Scalability** | Highly scalable | Limited scalability |
+| **User Experience** | Intuitive interface | Complex setup |
+| **Support** | 24/7 comprehensive support | Limited support hours |
+| **Integration** | Seamless integration | Requires custom work |
+
+## H2: Benefits of ${mainKeyword}
+
+### Primary Advantages
+
+**${mainKeyword}** offers numerous benefits that make it an exceptional choice:
+
+- **Enhanced Performance**: ${processedSentences.slice(8, 9).join('')}
+- **Improved Efficiency**: Streamlined processes that save time and resources
+- **Better Results**: Proven track record of delivering outstanding outcomes
+- **Cost Savings**: Significant reduction in operational costs
+
+### Secondary Benefits
+
+${secondaryKeywords.map(keyword => `- **${keyword}**: Enhanced capabilities that complement ${mainKeyword}`).join('\n')}
+
+## H2: Implementation Strategy
+
+### Getting Started
+
+${processedSentences.slice(9, 11).join('. ')}. Successful implementation of **${mainKeyword}** requires careful planning and execution.
+
+### Best Practices
+
+1. **Planning Phase**: Thorough analysis and strategy development
+2. **Implementation**: Step-by-step execution with **${mainKeyword}** integration
+3. **Optimization**: Continuous improvement and refinement
+4. **Monitoring**: Regular assessment and performance tracking
+
+## H2: Common Challenges and Solutions
+
+### Potential Obstacles
+
+${processedSentences.slice(11, 13).join('. ')}. While **${mainKeyword}** offers many advantages, understanding potential challenges helps in preparation.
+
+### Recommended Solutions
+
+- **Challenge 1**: Resource allocation difficulties
+  - *Solution*: Implement phased approach with **${mainKeyword}** priorities
+- **Challenge 2**: Technical complexity
+  - *Solution*: Leverage expert consultation and training
+- **Challenge 3**: Integration issues
+  - *Solution*: Use proven **${mainKeyword}** frameworks and tools
+
+## H2: Case Studies and Success Stories
+
+### Real-World Applications
+
+${processedSentences.slice(13, 15).join('. ')}. These examples demonstrate the practical value of **${mainKeyword}** in various scenarios.
+
+### Measurable Results
+
+Organizations implementing **${mainKeyword}** have reported:
+- 40% improvement in efficiency
+- 60% reduction in processing time
+- 25% cost savings on average
+- 90% user satisfaction rates
+
+## H2: Frequently Asked Questions (FAQ)
+
+### Q1: What is ${mainKeyword} and why is it important?
+**Answer:** **${mainKeyword}** is a comprehensive solution that addresses key challenges in modern business operations. Its importance lies in its ability to streamline processes, improve efficiency, and deliver measurable results.
+
+### Q2: How does ${mainKeyword} compare to traditional methods?
+**Answer:** Unlike traditional approaches, **${mainKeyword}** offers superior performance, better scalability, and more cost-effective solutions for long-term success.
+
+### Q3: What are the key benefits of implementing ${mainKeyword}?
+**Answer:** The primary benefits include enhanced performance, improved efficiency, cost savings, and better user experience. Additionally, **${mainKeyword}** provides scalability and comprehensive support.
+
+### Q4: How long does it take to see results with ${mainKeyword}?
+**Answer:** Most organizations begin seeing initial results within 2-4 weeks of implementing **${mainKeyword}**, with full benefits typically realized within 3-6 months.
+
+### Q5: Is ${mainKeyword} suitable for small businesses?
+**Answer:** Yes, **${mainKeyword}** is designed to scale according to business needs, making it suitable for organizations of all sizes, from startups to large enterprises.
+
+### Q6: What kind of support is available for ${mainKeyword}?
+**Answer:** Comprehensive support includes documentation, training resources, community forums, and direct technical assistance to ensure successful **${mainKeyword}** implementation.
+
+### Q7: Are there any prerequisites for using ${mainKeyword}?
+**Answer:** While **${mainKeyword}** is designed to be user-friendly, basic understanding of the relevant domain and clear objectives help maximize its effectiveness.
+
+### Q8: How much does ${mainKeyword} cost?
+**Answer:** **${mainKeyword}** offers flexible pricing models to accommodate different budgets and requirements, with options for both one-time purchases and subscription-based services.
+
+## H2: Future Trends and Developments
+
+### Emerging Opportunities
+
+${processedSentences.slice(15, 17).join('. ')}. The future of **${mainKeyword}** looks promising with continuous innovation and development.
+
+### Predicted Advancements
+
+- Enhanced AI integration with **${mainKeyword}**
+- Improved automation capabilities
+- Better cross-platform compatibility
+- Advanced analytics and reporting features
+
+## H2: Conclusion
+
+${processedSentences.slice(-2).join('. ')}. **${mainKeyword}** represents a significant advancement in addressing modern challenges, offering comprehensive solutions that deliver real value.
+
+**Key Takeaways:**
+- **${mainKeyword}** provides superior performance and efficiency
+- Implementation requires careful planning but delivers measurable results
+- Continuous support and updates ensure long-term success
+- Future developments promise even greater capabilities
+
+For organizations seeking to improve their operations and achieve better results, **${mainKeyword}** offers a proven path to success with comprehensive support and scalable solutions.
+
+---
+
+*This guide provides a comprehensive overview of **${mainKeyword}** and its applications. For specific implementation advice, consult with experts in your field.*
+`;
+
+            return structuredContent;
+        }
+
+        function displayRephrasedContent(content) {
+            const words = content.split(' ').length;
+            const chars = content.length;
+            const readingTime = Math.ceil(words / 200);
+            
+            // Update stats
+            document.getElementById('contentStats').innerHTML = `
+                <div class="stat-card">
+                    <h3>${words}</h3>
+                    <p>Words</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${chars}</h3>
+                    <p>Characters</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${readingTime}</h3>
+                    <p>Min Read</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${calculateKeywordDensity(content, document.getElementById('mainKeyword').value).density}%</h3>
+                    <p>Keyword Density</p>
+                </div>
+            `;
+            
+            // Convert markdown to HTML for display
+            const htmlContent = markdownToHtml(content);
+            
+            // Display structured content
+            document.getElementById('rephrasedContent').innerHTML = `
+                <h3>📝 Professionally Structured Content:</h3>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; max-height: 600px; overflow-y: auto;">
+                    ${htmlContent}
+                </div>
+            `;
+            
+            // Generate enhanced content structure suggestions
+            generateEnhancedContentSuggestions();
+        }
+
+        function markdownToHtml(markdown) {
+            let html = markdown
+                // Headers
+                .replace(/^# (.*$)/gm, '<h1 style="color: #1a1a2e; margin: 20px 0 10px 0; font-size: 2em;">$1</h1>')
+                .replace(/^## (.*$)/gm, '<h2 style="color: #16213e; margin: 20px 0 10px 0; font-size: 1.5em; border-bottom: 2px solid #0f3460; padding-bottom: 5px;">$1</h2>')
+                .replace(/^### (.*$)/gm, '<h3 style="color: #0f3460; margin: 15px 0 8px 0; font-size: 1.2em;">$1</h3>')
+                
+                // Bold text
+                .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1a1a2e;">$1</strong>')
+                
+                // Italic text
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                
+                // Lists
+                .replace(/^- (.*$)/gm, '<li style="margin: 5px 0;">$1</li>')
+                .replace(/^(\d+)\. (.*$)/gm, '<li style="margin: 5px 0;">$2</li>')
+                
+                // Tables
+                .replace(/\|(.+)\|/g, function(match, content) {
+                    if (content.includes('---')) {
+                        return ''; // Skip separator row
+                    }
+                    const cells = content.split('|').map(cell => cell.trim()).filter(cell => cell);
+                    if (cells.length > 0) {
+                        return '<tr>' + cells.map(cell => 
+                            cell.startsWith('**') ? 
+                            `<th style="background: #0f3460; color: white; padding: 12px; border: 1px solid #ddd;">${cell.replace(/\*\*/g, '')}</th>` : 
+                            `<td style="padding: 12px; border: 1px solid #ddd;">${cell}</td>`
+                        ).join('') + '</tr>';
+                    }
+                    return '';
+                })
+                
+                // Line breaks
+                .replace(/\n\n/g, '</p><p style="margin: 10px 0; line-height: 1.6;">')
+                .replace(/\n/g, '<br>');
+            
+            // Wrap in paragraphs
+            html = '<p style="margin: 10px 0; line-height: 1.6;">' + html + '</p>';
+            
+            // Wrap lists in ul tags
+            html = html.replace(/(<li.*?>.*?<\/li>)/gs, function(match) {
+                return '<ul style="margin: 10px 0; padding-left: 20px;">' + match + '</ul>';
+            });
+            
+            // Wrap table rows in table
+            html = html.replace(/(<tr>.*?<\/tr>)/gs, function(match) {
+                return '<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">' + match + '</table>';
+            });
+            
+            return html;
+        }
+
+        function generateEnhancedContentSuggestions() {
+            const mainKeyword = document.getElementById('mainKeyword').value;
+            const suggestions = document.getElementById('contentSuggestions');
+            
+            suggestions.innerHTML = `
+                <h3>📋 Content Structure Analysis:</h3>
+                
+                <div class="suggestion-item">
+                    <h4>✅ Generated Content Structure</h4>
+                    <p><strong>H1 Title:</strong> Main keyword-focused title</p>
+                    <p><strong>H2 Sections:</strong> 8+ comprehensive sections with proper hierarchy</p>
+                    <p><strong>H3 Subsections:</strong> Detailed breakdowns within each H2</p>
+                    <p><strong>FAQ Section:</strong> 8 relevant questions with detailed answers</p>
+                    <p><strong>Comparison Table:</strong> Professional table with key features</p>
+                    <p><strong>Structured Lists:</strong> Bullet points and numbered lists</p>
+                </div>
+                
+                <div class="suggestion-item">
+                    <h4>🎯 SEO Optimization Features</h4>
+                    <p>• <strong>Keyword Distribution:</strong> Natural placement of "${mainKeyword}" throughout content</p>
+                    <p>• <strong>Header Hierarchy:</strong> Proper H1, H2, H3 structure for search engines</p>
+                    <p>• <strong>Meta Description Ready:</strong> Overview section perfect for meta descriptions</p>
+                    <p>• <strong>Featured Snippets:</strong> FAQ format optimized for Google snippets</p>
+                    <p>• <strong>Internal Linking:</strong> Structure ready for cross-linking opportunities</p>
+                </div>
+                
+                <div class="suggestion-item">
+                    <h4>📊 Content Elements Included</h4>
+                    <p>• <strong>Introduction:</strong> Overview with keyword focus</p>
+                    <p>• <strong>Main Sections:</strong> Comprehensive coverage of "${mainKeyword}"</p>
+                    <p>• <strong>Comparison Table:</strong> Feature comparison with alternatives</p>
+                    <p>• <strong>Benefits Section:</strong> Primary and secondary advantages</p>
+                    <p>• <strong>Implementation Guide:</strong> Step-by-step approach</p>
+                    <p>• <strong>Challenges & Solutions:</strong> Problem-solving content</p>
+                    <p>• <strong>FAQ Section:</strong> 8 comprehensive Q&A pairs</p>
+                    <p>• <strong>Conclusion:</strong> Summary with key takeaways</p>
+                </div>
+                
+                <div class="suggestion-item">
+                    <h4>🖼️ Visual Content Recommendations</h4>
+                    <p>• <strong>Header Images:</strong> Add relevant images for each H2 section</p>
+                    <p>• <strong>Infographics:</strong> Create visual representations of the comparison table</p>
+                    <p>• <strong>Charts & Graphs:</strong> Visualize benefits and performance metrics</p>
+                    <p>• <strong>Screenshots:</strong> Include relevant screenshots for implementation steps</p>
+                    <p>• <strong>Process Diagrams:</strong> Visual flowcharts for complex procedures</p>
+                </div>
+                
+                <div class="suggestion-item">
+                    <h4>🎥 Video Content Ideas</h4>
+                    <p>• <strong>Tutorial Video:</strong> "Complete Guide to ${mainKeyword}"</p>
+                    <p>• <strong>Comparison Video:</strong> "${mainKeyword} vs Alternatives"</p>
+                    <p>• <strong>Case Study:</strong> Real-world implementation success story</p>
+                    <p>• <strong>FAQ Video:</strong> Answers to most common questions</p>
+                    <p>• <strong>Demo Video:</strong> Live demonstration of key features</p>
+                </div>
+                
+                <div class="suggestion-item">
+                    <h4>📈 Content Performance Tips</h4>
+                    <p>• <strong>Readability:</strong> Content structured for easy scanning</p>
+                    <p>• <strong>Engagement:</strong> FAQ section encourages user interaction</p>
+                    <p>• <strong>Shareability:</strong> Clear sections perfect for social media sharing</p>
+                    <p>• <strong>Authority:</strong> Comprehensive coverage establishes expertise</p>
+                    <p>• <strong>User Intent:</strong> Addresses all stages of user journey</p>
+                </div>
+            `;
+        }
+
+        function downloadWord() {
+            const content = document.getElementById('rephrasedContent').innerHTML;
+            const blob = new Blob([content], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'rephrased-content.doc';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Word document downloaded!', 'success');
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const content = rephrasedContentText;
+            const splitText = doc.splitTextToSize(content, 180);
+            
+            doc.setFontSize(16);
+            doc.text('SEO Optimized Content', 20, 20);
+            doc.setFontSize(12);
+            doc.text(splitText, 20, 40);
+            
+            doc.save('rephrased-content.pdf');
+            showNotification('PDF downloaded!', 'success');
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(rephrasedContentText).then(() => {
+                showNotification('Content copied to clipboard!', 'success');
+            });
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            `;
+            
+            if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+            } else if (type === 'error') {
+                notification.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Real-time content analysis
+        document.getElementById('originalContent').addEventListener('input', function() {
+            const content = this.value;
+            const mainKeyword = document.getElementById('mainKeyword').value;
+            
+            if (content && mainKeyword && content.split(' ').length >= 100) {
+                const analysis = calculateKeywordDensity(content, mainKeyword);
+                displayDensityAnalysis(analysis);
+            }
+        });
+
+        document.getElementById('mainKeyword').addEventListener('input', function() {
+            const content = document.getElementById('originalContent').value;
+            const mainKeyword = this.value;
+            
+            if (content && mainKeyword && content.split(' ').length >= 100) {
+                const analysis = calculateKeywordDensity(content, mainKeyword);
+                displayDensityAnalysis(analysis);
+            }
+        });
+    </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>

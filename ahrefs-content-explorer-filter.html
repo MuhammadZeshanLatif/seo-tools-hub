@@ -1,0 +1,2482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Backlink Analyzer Pro - Enhanced UI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <script src="auth-guard.js"></script>
+    <script src="resource-protection.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Layout utilities */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, 1fr);
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .lg-grid-cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .lg-col-span-1 {
+            grid-column: span 1;
+        }
+
+        .lg-col-span-3 {
+            grid-column: span 3;
+        }
+
+        .md-grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .gap-8 {
+            gap: 2rem;
+        }
+
+        /* Flexbox utilities */
+        .flex {
+            display: flex;
+        }
+
+        .inline-flex {
+            display: inline-flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .items-start {
+            align-items: flex-start;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .space-x-1>*+* {
+            margin-left: 0.25rem;
+        }
+
+        .space-x-3>*+* {
+            margin-left: 0.75rem;
+        }
+
+        .space-y-4>*+* {
+            margin-top: 1rem;
+        }
+
+        /* Spacing utilities */
+        .m-0 {
+            margin: 0;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+
+        .mr-2 {
+            margin-right: 0.5rem;
+        }
+
+        .mr-3 {
+            margin-right: 0.75rem;
+        }
+
+        .mr-4 {
+            margin-right: 1rem;
+        }
+
+        .ml-1 {
+            margin-left: 0.25rem;
+        }
+
+        .ml-2 {
+            margin-left: 0.5rem;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        .mt-8 {
+            margin-top: 2rem;
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .p-1 {
+            padding: 0.25rem;
+        }
+
+        .p-2 {
+            padding: 0.5rem;
+        }
+
+        .p-3 {
+            padding: 0.75rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .p-8 {
+            padding: 2rem;
+        }
+
+        .p-12 {
+            padding: 3rem;
+        }
+
+        .px-2 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .px-3 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .px-6 {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .py-1 {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .py-3 {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .py-12 {
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+
+        /* Text utilities */
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+        }
+
+        .text-5xl {
+            font-size: 3rem;
+        }
+
+        .text-6xl {
+            font-size: 3.75rem;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-white {
+            color: white;
+        }
+
+        .text-gray-400 {
+            color: #9ca3af;
+        }
+
+        .text-gray-500 {
+            color: #6b7280;
+        }
+
+        .text-gray-600 {
+            color: #4b5563;
+        }
+
+        .text-gray-700 {
+            color: #374151;
+        }
+
+        .text-gray-800 {
+            color: #1f2937;
+        }
+
+        .text-blue-600 {
+            color: #2563eb;
+        }
+
+        .text-blue-700 {
+            color: #1d4ed8;
+        }
+
+        .text-blue-800 {
+            color: #1e40af;
+        }
+
+        .text-green-500 {
+            color: #10b981;
+        }
+
+        .text-orange-500 {
+            color: #f97316;
+        }
+
+        .text-purple-600 {
+            color: #9333ea;
+        }
+
+        .text-red-600 {
+            color: #dc2626;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        .break-all {
+            word-break: break-all;
+        }
+
+        /* Background utilities */
+        .bg-white {
+            background-color: white;
+        }
+
+        .bg-gray-50 {
+            background-color: #f9fafb;
+        }
+
+        .bg-gray-100 {
+            background-color: #f3f4f6;
+        }
+
+        .bg-gray-200 {
+            background-color: #e5e7eb;
+        }
+
+        .bg-gray-300 {
+            background-color: #d1d5db;
+        }
+
+        .bg-blue-50 {
+            background-color: #eff6ff;
+        }
+
+        .bg-blue-500 {
+            background-color: #3b82f6;
+        }
+
+        .bg-green-50 {
+            background-color: #f0fdf4;
+        }
+
+        .bg-green-500 {
+            background-color: #10b981;
+        }
+
+        .bg-green-600 {
+            background-color: #059669;
+        }
+
+        .bg-red-50 {
+            background-color: #fef2f2;
+        }
+
+        .bg-red-500 {
+            background-color: #ef4444;
+        }
+
+        .bg-red-600 {
+            background-color: #dc2626;
+        }
+
+        .bg-purple-50 {
+            background-color: #faf5ff;
+        }
+
+        /* Border utilities */
+        .border {
+            border: 1px solid #e5e7eb;
+        }
+
+        .border-2 {
+            border: 2px solid #e5e7eb;
+        }
+
+        .border-b {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .border-gray-200 {
+            border-color: #e5e7eb;
+        }
+
+        .border-gray-300 {
+            border-color: #d1d5db;
+        }
+
+        .border-blue-200 {
+            border-color: #bfdbfe;
+        }
+
+        .border-purple-400 {
+            border-color: #c084fc;
+        }
+
+        .border-dashed {
+            border-style: dashed;
+        }
+
+        .rounded {
+            border-radius: 0.25rem;
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+
+        .rounded-full {
+            border-radius: 9999px;
+        }
+
+        /* Width and height utilities */
+        .w-full {
+            width: 100%;
+        }
+
+        .w-3 {
+            width: 0.75rem;
+        }
+
+        .w-4 {
+            width: 1rem;
+        }
+
+        .w-8 {
+            width: 2rem;
+        }
+
+        .w-16 {
+            width: 4rem;
+        }
+
+        .h-3 {
+            height: 0.75rem;
+        }
+
+        .h-4 {
+            height: 1rem;
+        }
+
+        .h-8 {
+            height: 2rem;
+        }
+
+        .h-16 {
+            height: 4rem;
+        }
+
+        .h-full {
+            height: 100%;
+        }
+
+        .min-h-screen {
+            min-height: 100vh;
+        }
+
+        .min-w-full {
+            min-width: 100%;
+        }
+
+        .max-w-xs {
+            max-width: 20rem;
+        }
+
+        .max-w-7xl {
+            max-width: 80rem;
+        }
+
+        .max-h-40 {
+            max-height: 10rem;
+        }
+
+        .max-h-64 {
+            max-height: 16rem;
+        }
+
+        /* Position utilities */
+        .relative {
+            position: relative;
+        }
+
+        .absolute {
+            position: absolute;
+        }
+
+        .fixed {
+            position: fixed;
+        }
+
+        .sticky {
+            position: sticky;
+        }
+
+        .inset-0 {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .top-4 {
+            top: 1rem;
+        }
+
+        .bottom-2rem {
+            bottom: 2rem;
+        }
+
+        .right-2rem {
+            right: 2rem;
+        }
+
+        /* Display utilities */
+        .hidden {
+            display: none;
+        }
+
+        .block {
+            display: block;
+        }
+
+        .inline-block {
+            display: inline-block;
+        }
+
+        /* Overflow utilities */
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto;
+        }
+
+        /* Opacity utilities */
+        .opacity-0 {
+            opacity: 0;
+        }
+
+        .opacity-20 {
+            opacity: 0.2;
+        }
+
+        .opacity-90 {
+            opacity: 0.9;
+        }
+
+        /* Z-index utilities */
+        .z-10 {
+            z-index: 10;
+        }
+
+        .z-1000 {
+            z-index: 1000;
+        }
+
+        /* Cursor utilities */
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        /* Transition utilities */
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .transition-colors {
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        /* Hover utilities */
+        .hover-bg-gray-300:hover {
+            background-color: #d1d5db;
+        }
+
+        .hover-bg-blue-600:hover {
+            background-color: #2563eb;
+        }
+
+        .hover-bg-green-600:hover {
+            background-color: #059669;
+        }
+
+        .hover-bg-red-600:hover {
+            background-color: #dc2626;
+        }
+
+        .hover-text-blue-800:hover {
+            color: #1e40af;
+        }
+
+        .hover-underline:hover {
+            text-decoration: underline;
+        }
+
+        .hover-border-purple-400:hover {
+            border-color: #c084fc;
+        }
+
+        /* Focus utilities */
+        .focus-ring-2:focus {
+            outline: 2px solid #9333ea;
+            outline-offset: 2px;
+        }
+
+        .focus-ring-purple-500:focus {
+            outline: 2px solid #a855f7;
+            outline-offset: 2px;
+        }
+
+        .focus-border-transparent:focus {
+            border-color: transparent;
+        }
+
+        /* Shadow utilities */
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .shadow-xl {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Divide utilities */
+        .divide-y>*+* {
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .divide-gray-200>*+* {
+            border-color: #e5e7eb;
+        }
+
+        /* Transform utilities */
+        .transform {
+            transform: translateZ(0);
+        }
+
+        .scale-105:hover {
+            transform: scale(1.05);
+        }
+
+        /* Tracking utilities */
+        .tracking-wider {
+            letter-spacing: 0.05em;
+        }
+
+        /* Whitespace utilities */
+        .whitespace-nowrap {
+            white-space: nowrap;
+        }
+
+        /* Pointer events utilities */
+        .pointer-events-none {
+            pointer-events: none;
+        }
+
+        /* Backdrop filter utilities */
+        .backdrop-filter {
+            backdrop-filter: blur(10px);
+        }
+
+        .backdrop-blur-lg {
+            backdrop-filter: blur(16px);
+        }
+
+        /* Media queries for responsive design */
+        @media (min-width: 768px) {
+            .md-text-2xl {
+                font-size: 1.5rem;
+            }
+
+            .md-text-6xl {
+                font-size: 3.75rem;
+            }
+
+            .md-grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .md-flex-row {
+                flex-direction: row;
+            }
+
+            .md-mt-0 {
+                margin-top: 0;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .lg-grid-cols-4 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .lg-col-span-1 {
+                grid-column: span 1;
+            }
+
+            .lg-col-span-3 {
+                grid-column: span 3;
+            }
+        }
+
+        /* Custom styles */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+        }
+
+        .glass-morphism {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .animated-gradient {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .loader {
+            border-top-color: #667eea;
+            animation: spinner 1.5s linear infinite;
+            border: 4px solid #e5e7eb;
+            border-radius: 50%;
+        }
+
+        @keyframes spinner {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .category-badge {
+            display: inline-block;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            margin: 0.125rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .category-badge:hover::before {
+            left: 100%;
+        }
+
+        .category-badge:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Category-specific background colors (non-gradient) */
+        .category-software-saas {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .category-digital-marketing {
+            background-color: #8b5cf6;
+            color: white;
+        }
+
+        .category-business-finance {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .category-real-estate {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .category-automotive {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .category-tech {
+            background-color: #6366f1;
+            color: white;
+        }
+
+        .category-health {
+            background-color: #ec4899;
+            color: white;
+        }
+
+        .category-education {
+            background-color: #f97316;
+            color: white;
+        }
+
+        .category-lifestyle {
+            background-color: #14b8a6;
+            color: white;
+        }
+
+        .category-fashion {
+            background-color: #f43f5e;
+            color: white;
+        }
+
+        .category-sports {
+            background-color: #059669;
+            color: white;
+        }
+
+        .category-travel {
+            background-color: #06b6d4;
+            color: white;
+        }
+
+        .category-food {
+            background-color: #d97706;
+            color: white;
+        }
+
+        .category-entertainment {
+            background-color: #7c3aed;
+            color: white;
+        }
+
+        .category-games {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .category-animations {
+            background-color: #9333ea;
+            color: white;
+        }
+
+        .category-general {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .filter-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .data-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-2px);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .floating-action-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.6);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(-45deg,
+                    rgba(255, 255, 255, .2) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, .2) 50%,
+                    rgba(255, 255, 255, .2) 75%,
+                    transparent 75%,
+                    transparent);
+            background-size: 50px 50px;
+            animation: move 2s linear infinite;
+        }
+
+        @keyframes move {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 50px 50px;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .tooltip:hover::before {
+            opacity: 1;
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .table-row-hover {
+            transition: all 0.2s ease;
+        }
+
+        .table-row-hover:hover {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            transform: scale(1.01);
+        }
+
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Tool visibility management */
+        .tool-hidden {
+            display: none !important;
+        }
+
+        .tool-visible {
+            display: block !important;
+        }
+
+        /* Input styling */
+        input[type="text"],
+        input[type="number"],
+        input[type="file"] {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #9333ea;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+        }
+
+        /* Button styling */
+        button {
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Table styling */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 100%);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #4b5563;
+        }
+
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            accent-color: #9333ea;
+        }
+
+        /* Link styling */
+        a {
+            color: #2563eb;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #1e40af;
+            text-decoration: underline;
+        }
+
+        /* Code styling */
+        code {
+            background-color: #e5e7eb;
+            color: #374151;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen animated-gradient">
+    <!-- Header -->
+    <header class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-20"></div>
+        <div class="relative z-10 container mx-auto px-6 py-12 text-center text-white">
+            <div class="slide-in">
+                <h1 class="text-5xl md-text-6xl font-bold mb-4">
+                    <i class="fas fa-link mr-4"></i>
+                    Ahrefs Content Explorer Filter Tool
+                </h1>
+                <p class="text-xl md-text-2xl opacity-90 mb-6">
+                    Powerful AI-driven Ahrefs Content Explorer Filter Tool with beautiful visualizations
+                </p>
+                <div
+                    class="inline-flex items-center bg-white bg-opacity-20 px-6 py-3 rounded-full backdrop-filter backdrop-blur-lg">
+                    <span class="text-sm font-semibold">Version 3.0</span>
+                    <span class="ml-2 px-2 py-1 bg-green-500 text-xs rounded-full">Enhanced</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-8 max-w-7xl">
+        <!-- File Upload Section -->
+        <div class="data-card p-8 mb-8 hover-lift">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold gradient-text flex items-center">
+                    <i class="fas fa-cloud-upload-alt mr-3 text-3xl"></i>
+                    Upload Your Data
+                </h2>
+                <div class="text-sm text-red-600 font-medium bg-red-50 px-4 py-2 rounded-lg">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Optimal performance: up to 10k rows
+                </div>
+            </div>
+
+            <div class="relative">
+                <input type="file" id="fileUpload" accept=".xlsx,.xls,.csv"
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                <div
+                    class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover-border-purple-400 transition-colors bg-gradient-to-br from-blue-50 to-purple-50">
+                    <i class="fas fa-file-excel text-6xl text-green-500 mb-4"></i>
+                    <p class="text-lg font-semibold text-gray-700 mb-2">Drop your file here or click to browse</p>
+                    <p class="text-sm text-gray-500">Supports .xlsx, .xls, and .csv files</p>
+                </div>
+            </div>
+
+            <div id="fileStats"
+                class="hidden mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span id="rowCount" class="font-semibold text-blue-700"></span>
+                    </div>
+                    <span id="columnInfo" class="text-sm text-gray-600"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg-grid-cols-4 gap-8">
+            <!-- Filters Sidebar -->
+            <div class="lg-col-span-1">
+                <div class="filter-card p-6 sticky top-4">
+                    <h2 class="text-xl font-bold mb-6 gradient-text flex items-center">
+                        <i class="fas fa-sliders-h mr-3"></i>
+                        Smart Filters
+                    </h2>
+
+                    <!-- DR Range -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-chart-line mr-2 text-blue-500"></i>
+                            DR Range (1-100)
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Minimum</label>
+                                <input type="number" id="minDR" min="1" max="100" value="1"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-sm focus-ring-2 focus-ring-purple-500 focus-border-transparent transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Maximum</label>
+                                <input type="number" id="maxDR" min="1" max="100" value="100"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-sm focus-ring-2 focus-ring-purple-500 focus-border-transparent transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Traffic Range -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-users mr-2 text-green-500"></i>
+                            Traffic Range (0-unlimited)
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Minimum</label>
+                                <input type="number" id="minTraffic" min="0" value="0"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-sm focus-ring-2 focus-ring-purple-500 focus-border-transparent transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Maximum (0 = unlimited)</label>
+                                <input type="number" id="maxTraffic" min="0" value="0" placeholder="0 for unlimited"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-sm focus-ring-2 focus-ring-purple-500 focus-border-transparent transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-semibold text-gray-700 flex items-center">
+                                <i class="fas fa-tags mr-2 text-green-500"></i>
+                                Categories
+                            </h3>
+                            <div class="space-x-1">
+                                <button id="selectAllCategoriesBtn"
+                                    class="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded hover-bg-gray-300 transition-colors">All</button>
+                                <button id="unselectAllCategoriesBtn"
+                                    class="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded hover-bg-gray-300 transition-colors">None</button>
+                            </div>
+                        </div>
+
+                        <input type="text" id="searchCategories" placeholder="Search categories..."
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-sm focus-ring-2 focus-ring-purple-500 focus-border-transparent mb-3 transition-all">
+
+                        <div class="max-h-64 overflow-y-auto custom-scrollbar border border-gray-200 rounded-lg p-3 bg-gray-50"
+                            id="categoriesContainer">
+                            <!-- Categories will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- TLD Filter -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-semibold text-gray-700 flex items-center">
+                                <i class="fas fa-globe mr-2 text-orange-500"></i>
+                                Domain Extensions
+                            </h3>
+                            <div class="space-x-1">
+                                <button id="selectAllTldsBtn"
+                                    class="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded hover-bg-gray-300 transition-colors">All</button>
+                                <button id="unselectAllTldsBtn"
+                                    class="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded hover-bg-gray-300 transition-colors">None</button>
+                            </div>
+                        </div>
+
+                        <div id="tldFilterContainer"
+                            class="max-h-40 overflow-y-auto custom-scrollbar border border-gray-200 rounded-lg p-3 bg-gray-50 grid grid-cols-2 gap-1">
+                            <!-- TLD filters will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Filter Button -->
+                    <button id="filterBtn"
+                        class="w-full py-3 px-4 gradient-bg text-white font-semibold rounded-lg shadow-lg hover-shadow-xl transition-all transform hover-scale-105 glow-effect">
+                        <i class="fas fa-magic mr-2"></i>
+                        Analyze Backlinks
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg-col-span-3">
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="hidden data-card p-8 mb-8">
+                    <div class="text-center">
+                        <div
+                            class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-16 w-16 mb-6 mx-auto">
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Processing Your Data</h3>
+                        <p id="processingStatus" class="text-gray-500 mb-4">Analyzing backlink profiles...</p>
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div id="statsSection" class="hidden mb-8">
+                    <div class="stats-grid">
+                        <div class="stat-card hover-lift">
+                            <i class="fas fa-link text-3xl mb-2"></i>
+                            <div class="text-2xl font-bold" id="totalBacklinks">0</div>
+                            <div class="text-sm opacity-90">Total links</div>
+                        </div>
+                        <div class="stat-card hover-lift">
+                            <i class="fas fa-star text-3xl mb-2"></i>
+                            <div class="text-2xl font-bold" id="avgScore">0</div>
+                            <div class="text-sm opacity-90">Avg DR Score</div>
+                        </div>
+                        <div class="stat-card hover-lift">
+                            <i class="fas fa-tags text-3xl mb-2"></i>
+                            <div class="text-2xl font-bold" id="uniqueCategories">0</div>
+                            <div class="text-sm opacity-90">Categories</div>
+                        </div>
+                        <div class="stat-card hover-lift">
+                            <i class="fas fa-globe text-3xl mb-2"></i>
+                            <div class="text-2xl font-bold" id="uniqueTlds">0</div>
+                            <div class="text-sm opacity-90">TLD Types</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div id="chartsSection" class="hidden mb-8">
+                    <div class="grid grid-cols-1 md-grid-cols-2 gap-6">
+                        <div class="chart-container">
+                            <h3 class="text-lg font-semibold mb-4 text-center">Category Distribution</h3>
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="text-lg font-semibold mb-4 text-center">DR Score Distribution</h3>
+                            <canvas id="scoreChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" class="hidden data-card p-6 mb-8">
+                    <div class="flex flex-col md-flex-row justify-between items-center mb-6 pb-4 border-b">
+                        <div>
+                            <h2 class="text-2xl font-bold gradient-text">Filtered Results</h2>
+                            <p id="resultCount" class="text-gray-600 mt-1">0 matching backlinks found</p>
+                            <div id="activeCategoryFilter" class="hidden mt-2">
+                                <span class="text-sm text-blue-600">Showing category:
+                                    <span id="activeCategoryName" class="font-semibold"></span>
+                                </span>
+                                <button id="clearCategoryFilter"
+                                    class="ml-2 px-3 py-1 bg-red-500 text-white text-xs rounded-full hover-bg-red-600 transition-colors">
+                                    Clear Filter
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3 mt-4 md-mt-0">
+                            <button id="downloadBtn"
+                                class="px-4 py-2 bg-green-500 hover-bg-green-600 text-white font-medium rounded-lg transition-all flex items-center shadow-lg hover-shadow-xl transform hover-scale-105">
+                                <i class="fas fa-download mr-2"></i>Download Excel
+                            </button>
+                            <button id="copyBtn"
+                                class="px-4 py-2 bg-blue-500 hover-bg-blue-600 text-white font-medium rounded-lg transition-all flex items-center shadow-lg hover-shadow-xl transform hover-scale-105">
+                                <i class="fas fa-copy mr-2"></i>Copy Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Category Stats -->
+                    <div id="categoryStats" class="mb-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border">
+                    </div>
+
+                    <!-- Results Table -->
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="min-w-full bg-white" id="resultsTable">
+                            <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover-bg-gray-300 transition-colors"
+                                        data-sort="dr">
+                                        DR Score <i class="fas fa-sort text-gray-400 ml-1"></i>
+                                    </th>
+                                    <th
+                                        class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Website
+                                    </th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover-bg-gray-300 transition-colors"
+                                        data-sort="traffic">
+                                        Traffic <i class="fas fa-sort text-gray-400 ml-1"></i>
+                                    </th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover-bg-gray-300 transition-colors"
+                                        data-sort="category">
+                                        Category <i class="fas fa-sort text-gray-400 ml-1"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody" class="divide-y divide-gray-200">
+                                <!-- Results will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- No Results Message -->
+                <div id="noResultsMessage" class="hidden data-card p-12 text-center">
+                    <i class="fas fa-search text-6xl text-gray-400 mb-6"></i>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">No Matching Backlinks Found</h3>
+                    <p class="text-gray-600 mb-6">Try adjusting your filter criteria or upload a different file.</p>
+                    <button class="px-6 py-3 gradient-bg text-white rounded-lg hover-shadow-lg transition-all">
+                        <i class="fas fa-redo mr-2"></i>Reset Filters
+                    </button>
+                </div>
+
+                <!-- Instructions Section -->
+                <div id="instructionsSection" class="data-card p-8">
+                    <h2 class="text-2xl font-bold mb-6 gradient-text flex items-center">
+                        <i class="fas fa-lightbulb mr-3"></i>
+                        How to Use This Tool
+                    </h2>
+
+                    <div class="grid grid-cols-1 md-grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                                    1</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Upload Your File</h4>
+                                    <p class="text-sm text-gray-600">Drag and drop or click to upload your website data
+                                        in Excel or CSV format.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">
+                                    2</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Configure Filters</h4>
+                                    <p class="text-sm text-gray-600">Set DR ranges (1-100), Traffic ranges
+                                        (0-unlimited), select categories, and choose domain extensions.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex-shrink-0 w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">
+                                    3</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Analyze Data</h4>
+                                    <p class="text-sm text-gray-600">Click "Analyze Backlinks" to process your data with
+                                        AI-powered categorization.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold">
+                                    4</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Explore Results</h4>
+                                    <p class="text-sm text-gray-600">View statistics, charts, and click category badges
+                                        to filter results.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">
+                                    5</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Export Data</h4>
+                                    <p class="text-sm text-gray-600">Download filtered results as Excel or copy to
+                                        clipboard for further analysis.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                        <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            File Format Requirements
+                        </h4>
+                        <p class="text-sm text-gray-700">
+                            Ensure your file includes columns like:
+                            <code>Website</code>,
+                            <code>DR</code>,
+                            <code>Total traffic</code> for optimal analysis.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button id="scrollToTop" class="floating-action-btn tooltip" data-tooltip="Scroll to Top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Global variables
+        let excelData = [];
+        let filteredData = [];
+        let allFilteredData = [];
+        let currentSortColumn = 'dr';
+        let isAscending = false;
+        let categoryStats = {};
+        let filterWorker;
+        let activeCategoryFilter = null;
+        let categoryChart, scoreChart;
+
+        // TLD filter data
+        const tldFilterData = [
+            ".com", ".net", ".org", ".co", ".io", ".ai", ".app", ".dev", ".tech", ".store",
+            ".info", ".biz", ".me", ".co.uk", ".ca", ".de", ".au", ".in", ".us", ".pk",
+            ".ae", ".ph", ".za", ".sg", ".ch", ".nl", ".ee", ".es", ".fr", ".it", ".mx",
+            ".br", ".com.au", ".co.in", ".com.pk", ".com.ph", ".co.za", ".com.sg",
+            ".com.es", ".com.mx", ".com.br", "Other TLDs"
+        ].sort();
+
+        // Category keywords for AI-powered categorization
+        const categoryKeywords = {
+            software_saas: ['software', 'saas', 'app', 'application', 'platform', 'tool', 'cloud', 'api', 'dashboard', 'crm', 'erp', 'service', 'solution', 'interface', 'database', 'deploy', 'dev', 'development', 'code', 'coding', 'program', 'programming', 'automation', 'integration', 'tech solution'],
+            digital_marketing: ['marketing', 'seo', 'sem', 'digital market', 'content market', 'email market', 'social media', 'ppc', 'pay-per-click', 'adwords', 'analytics', 'keyword', 'conversion', 'traffic', 'backlink', 'link building', 'audience', 'campaign', 'lead generation', 'funnel', 'branding', 'growth hacking'],
+            business_finance: ['business', 'finance', 'accounting', 'invest', 'investment', 'stock', 'trading', 'financial', 'money', 'capital', 'asset', 'bank', 'banking', 'loan', 'funding', 'startup', 'venture', 'entrepreneur', 'economic', 'budget', 'profit', 'revenue', 'income', 'corporate', 'enterprise', 'b2b', 'payment', 'invoice', 'billing'],
+            real_estate: ['real estate', 'property', 'housing', 'house', 'home', 'apartment', 'condo', 'condominium', 'mortgage', 'lease', 'rent', 'rental', 'commercial property', 'residential', 'realtor', 'broker', 'agent', 'listing', 'land', 'construction', 'development', 'building', 'realty', 'zoning'],
+            automotive: ['auto', 'car', 'vehicle', 'automotive', 'truck', 'suv', 'dealership', 'garage', 'mechanic', 'repair', 'parts', 'engine', 'tire', 'driver', 'driving', 'motor', 'motorcycle', 'transport', 'transportation', 'electric vehicle', 'ev', 'repair shop'],
+            tech: ['tech', 'technology', 'gadget', 'device', 'electronic', 'computer', 'laptop', 'desktop', 'hardware', 'iot', 'internet of things', 'artificial intelligence', 'ai', 'machine learning', 'ml', 'vr', 'ar', 'virtual reality', 'data science', 'robotics', 'innovation', 'it services', 'programming', 'developer', 'computer science'],
+            health: ['health', 'healthcare', 'medical', 'medicine', 'doctor', 'hospital', 'clinic', 'patient', 'fitness', 'wellness', 'nutrition', 'diet', 'exercise', 'workout', 'mental health', 'therapy', 'pharmacy', 'drug', 'supplement', 'vitamin', 'dentist', 'dental'],
+            education: ['education', 'school', 'university', 'college', 'campus', 'course', 'class', 'student', 'teacher', 'professor', 'academic', 'learn', 'learning', 'study', 'training', 'tutor', 'tutorial', 'workshop', 'lesson', 'lecture', 'curriculum', 'degree', 'diploma', 'edtech', 'online learning'],
+            lifestyle: ['lifestyle', 'life', 'living', 'daily', 'routine', 'habit', 'personal', 'self care', 'self-care', 'self improvement', 'mindfulness', 'wellbeing', 'hobby', 'leisure', 'experience', 'trend', 'luxury', 'comfort', 'culture', 'life advice', 'tips'],
+            fashion: ['fashion', 'style', 'clothing', 'apparel', 'wear', 'outfit', 'dress', 'garment', 'accessory', 'jewelry', 'textile', 'fabric', 'trend', 'design', 'collection', 'beauty', 'cosmetic', 'makeup', 'model', 'couture', 'runway'],
+            sports: ['sport', 'game', 'athlete', 'athletic', 'team', 'player', 'coach', 'league', 'tournament', 'championship', 'match', 'competition', 'fitness', 'exercise', 'workout', 'football', 'soccer', 'basketball', 'baseball', 'cricket', 'tennis', 'golf', 'swimming', 'cycling', 'running', 'esports', 'fitness training'],
+            travel: ['travel', 'tourism', 'tourist', 'trip', 'vacation', 'holiday', 'journey', 'destination', 'hotel', 'resort', 'accommodation', 'booking', 'flight', 'airline', 'airport', 'cruise', 'adventure', 'backpacking', 'sightseeing', 'guide', 'tour', 'itinerary'],
+            food: ['food', 'cooking', 'recipe', 'chef', 'kitchen', 'meal', 'dish', 'ingredient', 'restaurant', 'dining', 'cuisine', 'gourmet', 'baking', 'diet', 'nutrition', 'organic', 'vegan', 'vegetarian', 'beverage', 'drink', 'cocktail', 'foodie', 'food delivery', 'catering', 'bakery', 'grocery'],
+            entertainment: ['entertainment', 'movie', 'film', 'cinema', 'television', 'tv', 'show', 'series', 'actor', 'actress', 'celebrity', 'music', 'concert', 'festival', 'performance', 'theater', 'theatre', 'streaming', 'netflix', 'disney', 'hulu', 'podcast', 'video', 'pop culture'],
+            games: ['game', 'gaming', 'video game', 'console', 'pc gaming', 'mobile game', 'esports', 'gamer', 'gameplay', 'multiplayer', 'online game', 'rpg', 'fps', 'mmorpg', 'indie game', 'steam', 'playstation', 'xbox', 'nintendo', 'board game', 'card game', 'puzzle game', 'arcade'],
+            animations: ['animation', 'animated', 'cartoon', 'anime', 'manga', 'motion graphics', '3d animation', '2d animation', 'character design', 'storyboard', 'visual effects', 'vfx', 'cgi', 'digital art', 'illustration', 'graphic design', 'motion design', 'animator'],
+            general: ['blog', 'news', 'article', 'content', 'website', 'site', 'page', 'post', 'information', 'resource', 'guide', 'tips', 'advice', 'help', 'support', 'community', 'forum', 'discussion']
+        };
+
+        // Category colors for visual distinction (non-gradient solid colors)
+        const categoryColors = {
+            software_saas: 'category-software-saas',
+            digital_marketing: 'category-digital-marketing',
+            business_finance: 'category-business-finance',
+            real_estate: 'category-real-estate',
+            automotive: 'category-automotive',
+            tech: 'category-tech',
+            health: 'category-health',
+            education: 'category-education',
+            lifestyle: 'category-lifestyle',
+            fashion: 'category-fashion',
+            sports: 'category-sports',
+            travel: 'category-travel',
+            food: 'category-food',
+            entertainment: 'category-entertainment',
+            games: 'category-games',
+            animations: 'category-animations',
+            general: 'category-general'
+        };
+
+        // Web Worker for background processing
+        const workerScriptContent = `
+            const CATEGORY_KEYWORDS_WORKER = ${JSON.stringify(categoryKeywords)};
+            const TLD_FILTER_DATA_WORKER = ${JSON.stringify(tldFilterData)};
+
+            function getTldFromUrlWorker(url) {
+                if (!url || typeof url !== 'string') return '';
+                try {
+                    const fullUrl = url.startsWith('http://') || url.startsWith('https://') ? url : \`http://\${url}\`;
+                    const hostname = new URL(fullUrl).hostname;
+                    const parts = hostname.split('.');
+                    if (parts.length < 2) return (\`.\${parts[0]}\`).toLowerCase();
+                    const commonSecondLevel = ['co', 'com', 'org', 'net', 'gov', 'edu', 'ac', 'ltd', 'plc', 'me', 'biz', 'info'];
+                    if (parts.length > 2 && commonSecondLevel.includes(parts[parts.length - 2].toLowerCase())) {
+                        return (\`.\${parts[parts.length - 2]}.\${parts[parts.length - 1]}\`).toLowerCase();
+                    }
+                    return (\`.\${parts[parts.length - 1]}\`).toLowerCase();
+                } catch (e) {
+                    const domainMatch = url.match(/([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}/);
+                    if (domainMatch) {
+                        const domain = domainMatch[0];
+                        const parts = domain.split('.');
+                        if (parts.length < 2) return (\`.\${parts[0]}\`).toLowerCase();
+                        const commonSecondLevel = ['co', 'com', 'org', 'net', 'gov', 'edu', 'ac', 'ltd', 'plc', 'me', 'biz', 'info'];
+                        if (parts.length > 2 && commonSecondLevel.includes(parts[parts.length - 2].toLowerCase())) {
+                            return (\`.\${parts[parts.length - 2]}.\${parts[parts.length - 1]}\`).toLowerCase();
+                        }
+                        return (\`.\${parts[parts.length - 1]}\`).toLowerCase();
+                    }
+                    return '';
+                }
+            }
+
+            function detectCategoryWorker(url, title, sourceName) {
+                url = (url || '').toLowerCase();
+                title = (title || '').toLowerCase();
+                sourceName = (sourceName || '').toLowerCase();
+                const fullText = url + ' ' + title + ' ' + sourceName;
+                const detectedCategories = new Set();
+                
+                for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS_WORKER)) {
+                    for (const keyword of keywords) {
+                        if (fullText.includes(keyword)) {
+                            detectedCategories.add(category);
+                        }
+                    }
+                }
+                
+                return detectedCategories.size > 0 ? Array.from(detectedCategories) : ['general'];
+            }
+
+            self.onmessage = function(e) {
+                const { excelData: workerExcelData, minDR, maxDR, minTraffic, maxTraffic, selectedBlogCategories, selectedRawTlds, drCol, trafficCol, websiteCol } = e.data;
+                const isOtherTldFilterSelected = selectedRawTlds.includes("Other TLDs");
+                const specificTldsFilterSelected = selectedRawTlds.filter(tld => tld !== "Other TLDs").map(tld => tld.toLowerCase());
+                const allListedSpecificTldsForFilter = TLD_FILTER_DATA_WORKER.filter(tld => tld !== "Other TLDs").map(t => t.toLowerCase());
+                
+                let workerFilteredData = [];
+                let workerCategoryStats = {};
+                let processedCount = 0;
+                const totalRows = workerExcelData.length;
+                const batchSize = 500;
+
+                function processWorkerBatch() {
+                    const endIndex = Math.min(processedCount + batchSize, totalRows);
+                    
+                    for (let i = processedCount; i < endIndex; i++) {
+                        const row = workerExcelData[i];
+                        if (!row) continue;
+                        
+                        const dr = parseFloat(row[drCol] || row['DR'] || 0);
+                        if (dr < minDR || dr > maxDR) continue;
+                        
+                        const traffic = parseFloat(row[trafficCol] || row['Total traffic'] || 0);
+                        if (traffic < minTraffic || (maxTraffic > 0 && traffic > maxTraffic)) continue;
+                        
+                        const website = String(row[websiteCol] || row['Website'] || '');
+                        
+                        let sourceName = '';
+                        try {
+                            if (website) sourceName = (new URL(website.startsWith('http') ? website : \`http://\${website}\`).hostname);
+                        } catch(urlError) { }
+                        
+                        const siteTld = getTldFromUrlWorker(website);
+                        const detectedRowCategories = detectCategoryWorker(website, '', sourceName);
+                        
+                        if (!detectedRowCategories.some(cat => selectedBlogCategories.includes(cat))) continue;
+                        
+                        let passesTld = selectedRawTlds.length === 0;
+                        if (selectedRawTlds.length > 0) {
+                            passesTld = selectedRawTlds.some(selectedTldName => {
+                                if (selectedTldName === "Other TLDs") {
+                                    return siteTld ? !allListedSpecificTldsForFilter.includes(siteTld) : false;
+                                } else {
+                                    return siteTld === selectedTldName.toLowerCase();
+                                }
+                            });
+                        }
+                        
+                        if (!passesTld) continue;
+                        
+                        workerFilteredData.push({
+                            dr,
+                            traffic,
+                            website,
+                            categories: detectedRowCategories,
+                            tld: siteTld
+                        });
+                        
+                        detectedRowCategories.forEach(cat => workerCategoryStats[cat] = (workerCategoryStats[cat] || 0) + 1);
+                    }
+                    
+                    processedCount = endIndex;
+                    const progress = Math.round((processedCount / totalRows) * 100);
+                    self.postMessage({ type: 'progress', processed: processedCount, total: totalRows, progress });
+                    
+                    if (processedCount < totalRows) {
+                        setTimeout(processWorkerBatch, 0);
+                    } else {
+                        self.postMessage({ type: 'complete', results: workerFilteredData, stats: workerCategoryStats });
+                    }
+                }
+                
+                processWorkerBatch();
+            };
+        `;
+
+        // Initialize Web Worker
+        function initializeWorker() {
+            try {
+                const blob = new Blob([workerScriptContent], { type: 'application/javascript' });
+                filterWorker = new Worker(URL.createObjectURL(blob));
+
+                filterWorker.onmessage = function (e) {
+                    const { type, processed, total, progress, results, stats } = e.data;
+
+                    if (type === 'progress') {
+                        updateProgress(progress);
+                        document.getElementById('processingStatus').textContent = `Processed ${processed} of ${total} rows...`;
+                    } else if (type === 'complete') {
+                        allFilteredData = results;
+                        filteredData = results;
+                        categoryStats = stats;
+                        activeCategoryFilter = null;
+
+                        updateProgress(100);
+                        setTimeout(() => {
+                            hideLoading();
+                            updateStatistics();
+                            createCharts();
+                            sortResults();
+                            displayResults();
+                            manageToolVisibility();
+                        }, 500);
+                    }
+                };
+
+                filterWorker.onerror = function (error) {
+                    console.error('Web Worker error:', error);
+                    hideLoading();
+                    alert('An error occurred during processing. Please try again.');
+                };
+            } catch (error) {
+                console.error('Failed to create Web Worker:', error);
+                filterWorker = null;
+            }
+        }
+
+        // Tool visibility management
+        function manageToolVisibility() {
+            const instructionsSection = document.getElementById('instructionsSection');
+            const filterCard = document.querySelector('.filter-card');
+
+            if (filteredData.length > 0) {
+                // Hide instructions when data appears
+                instructionsSection.classList.add('tool-hidden');
+                // Show filter card
+                filterCard.classList.add('tool-visible');
+            } else {
+                // Show instructions when no data
+                instructionsSection.classList.remove('tool-hidden');
+                instructionsSection.classList.add('tool-visible');
+            }
+        }
+
+        // Utility functions
+        function formatCategoryName(category) {
+            if (!category) return 'N/A';
+            return category.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        function updateProgress(percentage) {
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+                progressFill.style.width = percentage + '%';
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('noResultsMessage').classList.add('hidden');
+            document.getElementById('statsSection').classList.add('hidden');
+            document.getElementById('chartsSection').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').classList.add('hidden');
+        }
+
+        function updateStatistics() {
+            if (filteredData.length === 0) return;
+
+            const totalBacklinks = filteredData.length;
+            const avgScore = Math.round(filteredData.reduce((sum, item) => sum + item.dr, 0) / totalBacklinks);
+            const uniqueCategories = new Set(filteredData.flatMap(item => item.categories)).size;
+            const uniqueTlds = new Set(filteredData.map(item => item.tld)).size;
+
+            document.getElementById('totalBacklinks').textContent = totalBacklinks.toLocaleString();
+            document.getElementById('avgScore').textContent = avgScore;
+            document.getElementById('uniqueCategories').textContent = uniqueCategories;
+            document.getElementById('uniqueTlds').textContent = uniqueTlds;
+
+            document.getElementById('statsSection').classList.remove('hidden');
+        }
+
+        function createCharts() {
+            if (filteredData.length === 0) return;
+
+            // Category Distribution Chart
+            const categoryData = Object.entries(categoryStats)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 10); // Top 10 categories
+
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            if (categoryChart) categoryChart.destroy();
+
+            categoryChart = new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryData.map(([cat]) => formatCategoryName(cat)),
+                    datasets: [{
+                        data: categoryData.map(([, count]) => count),
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                            '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+                            '#fa709a', '#fee140', '#a8edea', '#fed6e3'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+
+            // DR Score Distribution Chart
+            const scoreRanges = {
+                '1-20': 0, '21-40': 0, '41-60': 0, '61-80': 0, '81-100': 0
+            };
+
+            filteredData.forEach(item => {
+                const score = item.dr;
+                if (score <= 20) scoreRanges['1-20']++;
+                else if (score <= 40) scoreRanges['21-40']++;
+                else if (score <= 60) scoreRanges['41-60']++;
+                else if (score <= 80) scoreRanges['61-80']++;
+                else scoreRanges['81-100']++;
+            });
+
+            const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+            if (scoreChart) scoreChart.destroy();
+
+            scoreChart = new Chart(scoreCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(scoreRanges),
+                    datasets: [{
+                        label: 'Number of Websites',
+                        data: Object.values(scoreRanges),
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('chartsSection').classList.remove('hidden');
+        }
+
+        function populateCategories() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = '';
+
+            // Priority categories
+            const priorityCategories = ['software_saas', 'digital_marketing', 'business_finance', 'real_estate', 'automotive'];
+            const mainCategories = ['tech', 'health', 'education', 'lifestyle', 'fashion', 'sports', 'travel', 'food', 'entertainment'];
+            const newCategories = ['games', 'animations'];
+            const otherCategories = ['general'];
+
+            function createCategoryGroup(title, categories, bgColor = 'bg-gray-100') {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = `mb-3 p-2 ${bgColor} rounded-lg`;
+                groupDiv.innerHTML = `<div class="text-xs font-semibold text-gray-600 mb-2">${title}</div>`;
+
+                categories.forEach(category => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center p-2 hover:bg-white hover:bg-opacity-50 rounded-md cursor-pointer transition-all';
+                    label.innerHTML = `
+                        <input type="checkbox" class="category-checkbox h-4 w-4 text-purple-600 border-gray-300 rounded focus-ring-purple-500 mr-3" value="${category}" checked>
+                        <span class="text-sm text-gray-700">${formatCategoryName(category)}</span>
+                    `;
+                    groupDiv.appendChild(label);
+                });
+
+                container.appendChild(groupDiv);
+            }
+
+            createCategoryGroup('PRIORITY NICHES', priorityCategories, 'bg-blue-50');
+            createCategoryGroup('MAIN CATEGORIES', mainCategories, 'bg-green-50');
+            createCategoryGroup('NEW CATEGORIES', newCategories, 'bg-purple-50');
+            createCategoryGroup('OTHER', otherCategories, 'bg-gray-50');
+        }
+
+        function populateTlds() {
+            const container = document.getElementById('tldFilterContainer');
+            container.innerHTML = '';
+
+            tldFilterData.forEach(tld => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center p-1 hover:bg-white hover:bg-opacity-50 rounded cursor-pointer transition-all';
+                label.innerHTML = `
+                    <input type="checkbox" class="filter-checkbox h-3 w-3 text-purple-600 border-gray-300 rounded focus-ring-purple-500 mr-2" value="${tld}">
+                    <span class="text-xs text-gray-700">${tld}</span>
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        function filterByCategory(category) {
+            activeCategoryFilter = category;
+            filteredData = allFilteredData.filter(item => item.categories.includes(category));
+
+            const activeCategoryFilterDiv = document.getElementById('activeCategoryFilter');
+            const activeCategoryName = document.getElementById('activeCategoryName');
+            if (activeCategoryFilterDiv && activeCategoryName) {
+                activeCategoryFilterDiv.classList.remove('hidden');
+                activeCategoryName.textContent = formatCategoryName(category);
+            }
+
+            sortResults();
+            displayResults();
+        }
+
+        function clearCategoryFilter() {
+            activeCategoryFilter = null;
+            filteredData = allFilteredData;
+
+            const activeCategoryFilterDiv = document.getElementById('activeCategoryFilter');
+            if (activeCategoryFilterDiv) {
+                activeCategoryFilterDiv.classList.add('hidden');
+            }
+
+            sortResults();
+            displayResults();
+        }
+
+        function sortResults() {
+            filteredData.sort((a, b) => {
+                let valA, valB;
+
+                if (currentSortColumn === 'dr') {
+                    valA = a.dr;
+                    valB = b.dr;
+                } else if (currentSortColumn === 'traffic') {
+                    valA = a.traffic;
+                    valB = b.traffic;
+                } else if (currentSortColumn === 'category') {
+                    valA = (a.categories[0] || '').toLowerCase();
+                    valB = (b.categories[0] || '').toLowerCase();
+                    return isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else {
+                    valA = (a[currentSortColumn] || '').toLowerCase();
+                    valB = (b[currentSortColumn] || '').toLowerCase();
+                    return isAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
+
+                return isAscending ? valA - valB : valB - valA;
+            });
+        }
+
+        function displayResults() {
+            const tableBody = document.getElementById('resultsTableBody');
+            tableBody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                document.getElementById('resultsSection').classList.add('hidden');
+                document.getElementById('noResultsMessage').classList.remove('hidden');
+                return;
+            }
+
+            displayCategoryStats();
+
+            filteredData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'table-row-hover';
+
+                const categoryHtml = item.categories.map(cat =>
+                    `<span class="category-badge ${categoryColors[cat] || categoryColors.general}" data-category="${cat}">${formatCategoryName(cat)}</span>`
+                ).join(' ');
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 border-b border-gray-200 text-sm font-semibold">${item.dr}</td>
+                    <td class="py-3 px-4 border-b border-gray-200 text-sm break-all max-w-xs">
+                       <a 
+  href="${item.website.startsWith('http') ? item.website : 'https://' + item.website}" 
+  target="_blank" 
+  class="text-blue-600 hover-text-blue-800 hover-underline transition-colors" 
+  title="${item.website}">
+  ${item.website ? (item.website.length > 60 ? item.website.substring(0, 57) + '...' : item.website) : 'N/A'}
+</a>
+                    </td>
+                    <td class="py-3 px-4 border-b border-gray-200 text-sm font-medium">${item.traffic ? item.traffic.toLocaleString() : 'N/A'}</td>
+                    <td class="py-3 px-4 border-b border-gray-200 text-xs">${categoryHtml}</td>
+                `;
+
+                tableBody.appendChild(tr);
+            });
+
+            // Add click handlers for category badges
+            document.querySelectorAll('.category-badge[data-category]').forEach(badge => {
+                badge.addEventListener('click', function () {
+                    const category = this.getAttribute('data-category');
+                    filterByCategory(category);
+                });
+            });
+
+            document.getElementById('resultCount').textContent = `${filteredData.length} matching websites found`;
+            document.getElementById('resultsSection').classList.remove('hidden');
+            document.getElementById('noResultsMessage').classList.add('hidden');
+        }
+
+        function displayCategoryStats() {
+            const statsContainer = document.getElementById('categoryStats');
+            statsContainer.innerHTML = '';
+
+            let statsToShow = categoryStats;
+            if (activeCategoryFilter) {
+                statsToShow = {};
+                statsToShow[activeCategoryFilter] = filteredData.length;
+            }
+
+            const sortedStats = Object.entries(statsToShow).sort(([, a], [, b]) => b - a);
+
+            sortedStats.forEach(([category, count]) => {
+                const badge = document.createElement('span');
+                badge.className = `category-badge ${categoryColors[category] || categoryColors.general}`;
+                badge.textContent = `${formatCategoryName(category)}: ${count}`;
+                badge.setAttribute('data-category', category);
+                badge.addEventListener('click', function () {
+                    const cat = this.getAttribute('data-category');
+                    filterByCategory(cat);
+                });
+                statsContainer.appendChild(badge);
+            });
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeWorker();
+            populateCategories();
+            populateTlds();
+
+            // File upload
+            document.getElementById('fileUpload').addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    try {
+                        let parsedData;
+
+                        if (file.name.endsWith('.csv')) {
+                            const csvText = event.target.result;
+                            parsedData = Papa.parse(csvText, {
+                                header: true,
+                                skipEmptyLines: true
+                            }).data;
+                        } else {
+                            const data = new Uint8Array(event.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const firstSheetName = workbook.SheetNames[0];
+                            const worksheet = workbook.Sheets[firstSheetName];
+                            parsedData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                        }
+
+                        excelData = parsedData;
+                        document.getElementById('rowCount').textContent = `${excelData.length} rows loaded`;
+
+                        if (excelData.length > 0 && excelData[0]) {
+                            const columns = Object.keys(excelData[0]).join(', ');
+                            document.getElementById('columnInfo').textContent = `Columns: ${columns.length > 60 ? columns.substring(0, 60) + '...' : columns}`;
+                        }
+
+                        document.getElementById('fileStats').classList.remove('hidden');
+                        document.getElementById('instructionsSection').classList.add('hidden');
+
+                    } catch (error) {
+                        console.error('Error reading file:', error);
+                        alert('Error reading file. Please ensure it is a valid Excel or CSV file.');
+                    }
+                };
+
+                if (file.name.endsWith('.csv')) {
+                    reader.readAsText(file);
+                } else {
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+
+            // Category search
+            document.getElementById('searchCategories').addEventListener('input', function () {
+                const searchText = this.value.toLowerCase();
+                const labels = document.querySelectorAll('#categoriesContainer label');
+                labels.forEach(label => {
+                    const categoryText = label.textContent.toLowerCase();
+                    label.style.display = categoryText.includes(searchText) ? 'flex' : 'none';
+                });
+            });
+
+            // Filter button
+            document.getElementById('filterBtn').addEventListener('click', function () {
+                if (!excelData || excelData.length === 0) {
+                    alert('Please upload an Excel or CSV file first.');
+                    return;
+                }
+
+                const minDR = parseInt(document.getElementById('minDR').value) || 1;
+                const maxDR = parseInt(document.getElementById('maxDR').value) || 100;
+                const minTraffic = parseInt(document.getElementById('minTraffic').value) || 0;
+                const maxTraffic = parseInt(document.getElementById('maxTraffic').value) || 0;
+                const selectedBlogCategories = Array.from(document.querySelectorAll('#categoriesContainer .category-checkbox:checked')).map(cb => cb.value);
+                const selectedRawTlds = Array.from(document.querySelectorAll('#tldFilterContainer .filter-checkbox:checked')).map(cb => cb.value);
+
+                if (selectedBlogCategories.length === 0) {
+                    alert('Please select at least one category.');
+                    return;
+                }
+
+                showLoading();
+                updateProgress(0);
+                document.getElementById('processingStatus').textContent = 'Preparing data for processing...';
+
+                // Find column names
+                let drCol, trafficCol, websiteCol;
+                if (excelData.length > 0 && excelData[0]) {
+                    const firstRow = excelData[0];
+                    const cols = Object.keys(firstRow);
+
+                    for (const col of cols) {
+                        const lowerCol = col.toLowerCase().trim();
+                        if (!drCol && lowerCol.includes('dr')) {
+                            drCol = col;
+                        } else if (!trafficCol && lowerCol.includes('traffic')) {
+                            trafficCol = col;
+                        } else if (!websiteCol && lowerCol.includes('website')) {
+                            websiteCol = col;
+                        }
+                    }
+                }
+
+                if (filterWorker) {
+                    filterWorker.postMessage({
+                        excelData,
+                        minDR,
+                        maxDR,
+                        minTraffic,
+                        maxTraffic,
+                        selectedBlogCategories,
+                        selectedRawTlds,
+                        drCol,
+                        trafficCol,
+                        websiteCol
+                    });
+                }
+            });
+
+            // Category filter controls
+            document.getElementById('selectAllCategoriesBtn').addEventListener('click', () => {
+                document.querySelectorAll('#categoriesContainer .category-checkbox').forEach(cb => cb.checked = true);
+            });
+
+            document.getElementById('unselectAllCategoriesBtn').addEventListener('click', () => {
+                document.querySelectorAll('#categoriesContainer .category-checkbox').forEach(cb => cb.checked = false);
+            });
+
+            // TLD filter controls
+            document.getElementById('selectAllTldsBtn').addEventListener('click', () => {
+                document.querySelectorAll('#tldFilterContainer .filter-checkbox').forEach(cb => cb.checked = true);
+            });
+
+            document.getElementById('unselectAllTldsBtn').addEventListener('click', () => {
+                document.querySelectorAll('#tldFilterContainer .filter-checkbox').forEach(cb => cb.checked = false);
+            });
+
+            // Clear category filter
+            document.getElementById('clearCategoryFilter').addEventListener('click', clearCategoryFilter);
+
+            // Download button
+            document.getElementById('downloadBtn').addEventListener('click', function () {
+                if (filteredData.length === 0) {
+                    alert('No data to download.');
+                    return;
+                }
+
+                const ws = XLSX.utils.json_to_sheet(filteredData.map(item => ({
+                    'DR Score': item.dr,
+                    'Website': item.website,
+                    'Traffic': item.traffic,
+                    'No of Pages': item["Total pages"],
+                    'Categories': item.categories.map(formatCategoryName).join(', '),
+                    'TLD': item.tld
+                })));
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Filtered Websites");
+                XLSX.writeFile(wb, "enhanced_websites_analysis.xlsx");
+            });
+
+            // Copy button
+            document.getElementById('copyBtn').addEventListener('click', function () {
+                if (filteredData.length === 0) {
+                    alert('No data to copy.');
+                    return;
+                }
+
+                let text = 'DR Score\tWebsite\tTraffic\tCategories\tTLD\n';
+                filteredData.forEach(item => {
+                    text += `${item.dr}\t${item.website || ''}\t${item.traffic || ''}\t${item.categories.map(formatCategoryName).join(', ')}\t${item.tld || ''}\n`;
+                });
+
+                const copyButton = this;
+                navigator.clipboard.writeText(text).then(() => {
+                    copyButton.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
+                    copyButton.classList.replace('bg-blue-500', 'bg-green-500');
+                    copyButton.classList.replace('hover-bg-blue-600', 'hover-bg-green-600');
+
+                    setTimeout(() => {
+                        copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copy Data';
+                        copyButton.classList.replace('bg-green-500', 'bg-blue-500');
+                        copyButton.classList.replace('hover-bg-green-600', 'hover-bg-blue-600');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    alert('Failed to copy data to clipboard.');
+                });
+            });
+
+            // Sortable headers
+            const sortableHeaders = document.querySelectorAll('th[data-sort]');
+            sortableHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const column = this.dataset.sort;
+
+                    if (currentSortColumn === column) {
+                        isAscending = !isAscending;
+                    } else {
+                        currentSortColumn = column;
+                        isAscending = column === 'dr' || column === 'traffic' ? false : true;
+                    }
+
+                    sortableHeaders.forEach(h => h.querySelector('i').className = 'fas fa-sort text-gray-400 ml-1');
+                    this.querySelector('i').className = `fas ${isAscending ? 'fa-sort-up' : 'fa-sort-down'} text-purple-600 ml-1`;
+
+                    sortResults();
+                    displayResults();
+                });
+            });
+
+            // Scroll to top button
+            document.getElementById('scrollToTop').addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Show/hide scroll to top button
+            window.addEventListener('scroll', function () {
+                const scrollBtn = document.getElementById('scrollToTop');
+                if (window.pageYOffset > 300) {
+                    scrollBtn.style.display = 'flex';
+                } else {
+                    scrollBtn.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

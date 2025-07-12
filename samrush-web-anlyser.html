@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Website Analytics & Filter Tool</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="auth-guard.js"></script>
+    <script src="resource-protection.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --error-color: #f56565;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --sidebar-width: 380px;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #1a202c;
+            --surface-color: #2d3748;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --text-muted: #718096;
+            --border-color: #4a5568;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .app-container {
+            /* min-height: 100vh; */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface-color);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .logo i {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            color: var(--text-primary);
+        }
+
+        .sidebar-toggle:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .theme-toggle {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        /* Main Layout */
+        .main-layout {
+            flex: 1;
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: calc(100vh - 80px);
+            /* full height of viewport */
+            overflow-y: auto;
+            /* enable vertical scroll */
+            position: fixed;
+            /* keep it in place */
+            top: 73px;
+            left: 0;
+            width: 400px;
+            padding: 18px 20px 10px 20px;
+            /* or your desired width */
+            background-color: var(--background-color);
+            /* optional, for clarity */
+            border-right: 1px solid #ddd;
+            /* optional, for visual separation */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .sidebar {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+            /* Firefox */
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+
+
+        .sidebar.collapsed {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar-content {
+            padding: 2rem;
+            height: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: var(--background-color);
+            margin-left: 400px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-icon {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        /* Upload Section */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            margin-bottom: 2rem;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .filter-group {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-group-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--surface-color);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .filter-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-color: var(--primary-color);
+        }
+
+        .filter-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: var(--primary-color);
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Priority Categories */
+        .priority-category {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 193, 7, 0.1));
+            border: 2px solid #ffd700;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .priority-category .filter-item {
+            background: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .priority-category .filter-item {
+            background: rgba(45, 55, 72, 0.9);
+        }
+
+        /* Key Business Areas */
+        .key-business-areas {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border: 2px solid var(--primary-color);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .key-business-areas .filter-item {
+            background: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .key-business-areas .filter-item {
+            background: rgba(45, 55, 72, 0.9);
+        }
+
+        /* Website Purpose */
+        .website-purpose {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(56, 178, 172, 0.1));
+            border: 2px solid var(--success-color);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .website-purpose .filter-item {
+            background: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .website-purpose .filter-item {
+            background: rgba(45, 55, 72, 0.9);
+        }
+
+        /* Input Fields */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .input-field {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--surface-color);
+            color: var(--text-primary);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .upload-area h3 {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            word-wrap: break-word;
+            word-break: break-all;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .process-button {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            margin-top: 2rem;
+        }
+
+        .bulk-action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .bulk-action-buttons .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Results Section */
+
+        .results-section.show {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Category Tags */
+        .category-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-tag {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .category-tag:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .category-tag.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--surface-color);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .table-controls {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .table tr:hover {
+            background: rgba(102, 126, 234, 0.02);
+        }
+
+        .website-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .website-link:hover {
+            text-decoration: underline;
+        }
+
+        .traffic-value {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .category-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .category-badge {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading.show {
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            width: 100%;
+            padding: 2rem;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.171);
+        }
+
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+.btn-top-analyze{
+    margin-top: 0;
+}
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                height: calc(100vh - 80px);
+                z-index: 50;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .sidebar.collapsed {
+                margin-left: 0;
+                transform: translateX(-100%);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+                margin: 0;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-tags {
+                justify-content: center;
+            }
+
+            .sidebar-content {
+                padding: 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Dark mode specific adjustments */
+        [data-theme="dark"] .upload-area {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        [data-theme="dark"] .filter-group {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        [data-theme="dark"] .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+        }
+
+        [data-theme="dark"] .category-tag {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+        }
+
+        [data-theme="dark"] .table th {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+        }
+
+        [data-theme="dark"] .table tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <span>WebAnalytics Pro</span>
+                </div>
+                <div class="header-controls">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+
+                <!-- Upload Section -->
+                <div class="upload-area" id="uploadArea">
+                    <i class="upload-icon fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Data</h3>
+                    <p>Drag and drop your CSV or Excel file here</p>
+                    <input type="file" id="fileInput" class="file-input" accept=".csv,.xlsx,.xls">
+                    <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i>
+                        Choose File
+                    </button>
+                    <p style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                        CSV, Excel (.xlsx, .xls)
+                    </p>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <!-- Priority Category (Software & SaaS) -->
+                    <div class="priority-category">
+                        <h4 style="margin-bottom: 1rem; color: #b8860b; font-weight: 600;">
+                            <i class="fas fa-star"></i> Priority Category
+                        </h4>
+                        <div class="filter-grid">
+                            <div class="filter-item">
+                                <input type="checkbox" id="software" class="filter-checkbox category-checkbox" checked>
+                                <label for="software" class="filter-label">💻 Software & SaaS</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Business Areas -->
+                    <div class="key-business-areas">
+                        <h4 style="margin-bottom: 1rem; color: var(--primary-color); font-weight: 600;">
+                            <i class="fas fa-briefcase"></i> Key Business Areas
+                        </h4>
+                        <div class="filter-grid">
+                            <div class="filter-item">
+                                <input type="checkbox" id="digitalmarketing" class="filter-checkbox category-checkbox"
+                                    checked>
+                                <label for="digitalmarketing" class="filter-label">📈 Digital Marketing & SEO</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="businessfinance" class="filter-checkbox category-checkbox"
+                                    checked>
+                                <label for="businessfinance" class="filter-label">🏢 Business & Finance</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="realestate" class="filter-checkbox category-checkbox"
+                                    checked>
+                                <label for="realestate" class="filter-label">🏠 Real Estate</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="automotive" class="filter-checkbox category-checkbox"
+                                    checked>
+                                <label for="automotive" class="filter-label">🚗 Automotive</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="homeimprovement" class="filter-checkbox category-checkbox"
+                                    checked>
+                                <label for="homeimprovement" class="filter-label">🏡 Home Improvement &
+                                    Gardening</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Website Purpose/Structure -->
+                    <div class="website-purpose">
+                        <h4 style="margin-bottom: 1rem; color: var(--success-color); font-weight: 600;">
+                            <i class="fas fa-globe"></i> Website Purpose/Structure
+                        </h4>
+                        <div class="filter-grid">
+                            <div class="filter-item">
+                                <input type="checkbox" id="blogGuestPosting" class="filter-checkbox category-checkbox">
+                                <label for="blogGuestPosting" class="filter-label">📝 Blog / Guest Posting</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="serviceBased" class="filter-checkbox category-checkbox">
+                                <label for="serviceBased" class="filter-label">🛠️ Service-Based</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="ecommerce" class="filter-checkbox category-checkbox">
+                                <label for="ecommerce" class="filter-label">🛒 E-commerce</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- General Categories -->
+                    <div class="filter-group">
+                        <h3 class="filter-group-title">
+                            <i class="fas fa-th-large"></i>
+                            General Categories
+                        </h3>
+                        <div class="filter-grid">
+                            <div class="filter-item">
+                                <input type="checkbox" id="business" class="filter-checkbox category-checkbox" checked>
+                                <label for="business" class="filter-label">💼 Business</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="tech" class="filter-checkbox category-checkbox" checked>
+                                <label for="tech" class="filter-label">⚙️ Tech</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="fashion" class="filter-checkbox category-checkbox" checked>
+                                <label for="fashion" class="filter-label">👗 Fashion</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="sports" class="filter-checkbox category-checkbox" checked>
+                                <label for="sports" class="filter-label">⚽ Sports</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="travel" class="filter-checkbox category-checkbox" checked>
+                                <label for="travel" class="filter-label">✈️ Travel</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="crypto" class="filter-checkbox category-checkbox" checked>
+                                <label for="crypto" class="filter-label">₿ Crypto</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="finance" class="filter-checkbox category-checkbox" checked>
+                                <label for="finance" class="filter-label">💰 Finance</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="education" class="filter-checkbox category-checkbox" checked>
+                                <label for="education" class="filter-label">📚 Education</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="health" class="filter-checkbox category-checkbox" checked>
+                                <label for="health" class="filter-label">🏥 Health</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="law" class="filter-checkbox category-checkbox" checked>
+                                <label for="law" class="filter-label">⚖️ Law</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="lifestyle" class="filter-checkbox category-checkbox" checked>
+                                <label for="lifestyle" class="filter-label">⭐ Lifestyle</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="wedding" class="filter-checkbox category-checkbox" checked>
+                                <label for="wedding" class="filter-label">💒 Wedding</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="pets" class="filter-checkbox category-checkbox" checked>
+                                <label for="pets" class="filter-label">🐾 Pets</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="photography" class="filter-checkbox category-checkbox"
+                                    checked>
+                                <label for="photography" class="filter-label">📸 Photography</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="entertainment" class="filter-checkbox category-checkbox"
+                                    checked>
+                                <label for="entertainment" class="filter-label">🎬 Entertainment</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="food" class="filter-checkbox category-checkbox" checked>
+                                <label for="food" class="filter-label">🍕 Food</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Traffic Filters -->
+                    <div class="filter-group">
+                        <h3 class="filter-group-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Traffic Filters
+                        </h3>
+                        <div class="input-group">
+                            <label class="input-label" for="minTraffic">Minimum Traffic</label>
+                            <input type="number" id="minTraffic" class="input-field" value="1000" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label" for="maxTraffic">Maximum Traffic</label>
+                            <input type="number" id="maxTraffic" class="input-field" value="1000000" min="0">
+                        </div>
+                    </div>
+
+                    <!-- Geographic Filters -->
+                    <div class="filter-group">
+                        <h3 class="filter-group-title">
+                            <i class="fas fa-globe-americas"></i>
+                            Geographic Filters
+                        </h3>
+                        <div id="countryFilters" class="filter-grid" style="max-height: 200px; overflow-y: auto;">
+                            <!-- Country filters will be populated here -->
+                        </div>
+                        <div class="bulk-action-buttons">
+                            <button class="btn btn-secondary" onclick="selectAllCountries()">Select All</button>
+                            <button class="btn btn-secondary" onclick="unselectAllCountries()">Clear All</button>
+                        </div>
+                    </div>
+
+                    <!-- Domain Extension Filters -->
+                    <div class="filter-group">
+                        <h3 class="filter-group-title">
+                            <i class="fas fa-link"></i>
+                            Domain Extensions
+                        </h3>
+                        <div id="tldFilters" class="filter-grid" style="max-height: 200px; overflow-y: auto;">
+                            <!-- TLD filters will be populated here -->
+                        </div>
+                        <div class="bulk-action-buttons">
+                            <button class="btn btn-secondary" onclick="selectAllTlds()">Select All</button>
+                            <button class="btn btn-secondary" onclick="unselectAllTlds()">Clear All</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary process-button" onclick="processData()">
+                    <i class="fas fa-cogs"></i>
+                    Analyze & Filter Data
+                </button>
+
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Loading -->
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Processing your data...</p>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section" id="resultsSection">
+                    <!-- Statistics -->
+                    <div class="card fade-in-up">
+                        <div class="card-header">
+                            <div class="header-left">
+                                <i class="card-icon fas fa-chart-pie"></i>
+                                <h2 class="card-title">Analytics Overview</h2>
+                            </div>
+                            <div class="header-right">
+                                <button class="btn btn-primary process-button btn-top-analyze" onclick="processData()">
+                                    <i class="fas fa-cogs"></i>
+                                    Analyze & Filter Data
+                                </button>
+                            </div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalWebsites">0</div>
+                                <div class="stat-label">Total Websites</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalTraffic">0</div>
+                                <div class="stat-label">Total Traffic</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="avgTraffic">0</div>
+                                <div class="stat-label">Average Traffic</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="topCategory">-</div>
+                                <div class="stat-label">Top Category</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Summary -->
+                    <div class="card fade-in-up">
+                        <div class="card-header">
+                            <i class="card-icon fas fa-tags"></i>
+                            <h2 class="card-title">Category Summary</h2>
+                            <button class="btn btn-success" onclick="downloadResults()">
+                                <i class="fas fa-download"></i>
+                                Download Results
+                            </button>
+                        </div>
+                        <div class="category-tags" id="categoryTags">
+                            <!-- Category tags will be populated here -->
+                        </div>
+                        <button class="btn btn-secondary" id="clearCategoryFilter" onclick="clearCategoryFilter()"
+                            style="display: none;">
+                            <i class="fas fa-times"></i>
+                            Clear Category Filter
+                        </button>
+                    </div>
+
+                    <!-- Results Table -->
+                    <div class="card fade-in-up">
+                        <div class="card-header">
+                            <i class="card-icon fas fa-table"></i>
+                            <h2 class="card-title">Filtered Results</h2>
+                        </div>
+                        <div class="table-container">
+                            <div class="table-controls">
+                                <input type="text" id="searchInput" class="input-field" placeholder="Search websites..."
+                                    style="flex: 1; min-width: 200px;">
+                                <select id="sortSelect" class="input-field" onchange="sortResults()"
+                                    style="min-width: 200px;">
+                                    <option value="traffic-desc">Traffic (High to Low)</option>
+                                    <option value="traffic-asc">Traffic (Low to High)</option>
+                                    <option value="domain-asc">Domain (A to Z)</option>
+                                    <option value="domain-desc">Domain (Z to A)</option>
+                                </select>
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Website</th>
+                                        <th>Traffic</th>
+                                        <th>Categories</th>
+                                        <th>Domain Extension</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultsTable">
+                                    <!-- Results will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Notification</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalMessage"></div>
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button class="btn btn-primary" onclick="closeModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+   
+
+</body>
+<script>
+     
+        // Enhanced category keywords with more comprehensive detection
+        const categoryKeywords = {
+            // Priority Category
+            software: ['software', 'saas', 'app', 'platform', 'tool', 'cloud', 'api', 'dashboard', 'crm', 'erp', 'automation', 'integration', 'system', 'solution', 'download', 'tech solution', 'application', 'program'],
+
+            // Key Business Areas
+            digitalmarketing: ['seo', 'marketing', 'advertising', 'analytics', 'social media', 'ppc', 'email marketing', 'conversion', 'campaign', 'digital', 'adwords', 'facebook ads', 'instagram marketing', 'content marketing', 'growth hacking'],
+            businessfinance: ['business', 'finance', 'banking', 'investment', 'accounting', 'invoice', 'billing', 'payment', 'financial planning', 'revenue', 'profit', 'enterprise solutions', 'startup funding', 'venture capital'],
+            realestate: ['real estate', 'property', 'homes', 'houses', 'apartments', 'condos', 'rental', 'mortgage', 'realtor', 'mls', 'listing', 'buy home', 'sell home', 'rent', 'lease'],
+            automotive: ['automotive', 'cars', 'auto', 'vehicle', 'truck', 'motorcycle', 'parts', 'repair', 'dealership', 'used cars', 'new cars', 'car insurance', 'auto loan'],
+            homeimprovement: ['home improvement', 'gardening', 'landscaping', 'renovation', 'remodeling', 'diy', 'tools', 'hardware', 'garden', 'plants', 'lawn care', 'interior design'],
+
+            // Website Purpose/Structure
+            blogGuestPosting: ['blog', 'blogs', 'article', 'articles', 'news', 'insights', 'updates', 'guest post', 'write for us', 'contribute', 'editorial', 'submissions', 'author guidelines', 'content hub', 'latest posts', 'our blog', 'publication', 'stories'],
+            serviceBased: ['services', 'solutions', 'consulting', 'agency', 'hire us', 'our work', 'portfolio', 'request quote', 'pricing', 'packages', 'offerings', 'capabilities', 'expertise', 'get started', 'contact us for services', 'managed services', 'professional services', 'our services', 'book a demo', 'schedule consultation'],
+            ecommerce: ['shop', 'store', 'cart', 'checkout', 'buy now', 'products', 'add to cart', 'catalog', 'sale', 'online store', 'marketplace', 'e-shop', 'browse products', 'view cart', 'order', 'wishlist', 'my account', 'new arrivals', 'bestsellers', 'collections'],
+
+            // General Categories
+            business: ['business', 'company', 'corporate', 'enterprise', 'startup', 'entrepreneur', 'industry', 'commerce', 'trade', 'management', 'strategy'],
+            tech: ['tech', 'technology', 'hardware', 'programming', 'developer', 'code', 'digital transformation', 'computer science', 'gadget', 'innovation', 'it services'],
+            fashion: ['fashion', 'style', 'clothing', 'dress', 'apparel', 'outfit', 'beauty', 'models', 'designer', 'trend', 'couture', 'runway'],
+            sports: ['sports', 'fitness', 'gym', 'workout', 'exercise', 'athlete', 'team', 'game', 'competition', 'training', 'coaching'],
+            travel: ['travel', 'tourism', 'vacation', 'destination', 'hotel', 'flight', 'tour', 'trip', 'holiday', 'adventure', 'booking', 'itinerary'],
+            crypto: ['crypto', 'cryptocurrency', 'bitcoin', 'blockchain', 'ethereum', 'trading', 'wallet', 'mining', 'defi', 'nft'],
+            finance: ['finance', 'money', 'invest', 'stock market', 'trading', 'economy', 'fund', 'wealth management', 'personal finance', 'loans'],
+            education: ['education', 'school', 'university', 'college', 'learn', 'student', 'teach', 'academic', 'course', 'tutor', 'online learning', 'edtech'],
+            health: ['health', 'medical', 'wellness', 'fitness', 'doctor', 'hospital', 'diet', 'nutrition', 'medicine', 'healthcare', 'mental health', 'therapy'],
+            law: ['law', 'legal', 'lawyer', 'attorney', 'court', 'litigation', 'legal advice', 'law firm', 'paralegal', 'legal services'],
+            lifestyle: ['lifestyle', 'living', 'home', 'family', 'relationships', 'personal development', 'self improvement', 'wellness', 'mindfulness'],
+            wedding: ['wedding', 'marriage', 'bride', 'groom', 'ceremony', 'reception', 'wedding planning', 'bridal', 'engagement'],
+            pets: ['pets', 'dogs', 'cats', 'animals', 'veterinary', 'pet care', 'pet supplies', 'grooming', 'training'],
+            photography: ['photography', 'photo', 'camera', 'photographer', 'portrait', 'wedding photography', 'studio', 'editing'],
+            entertainment: ['entertainment', 'movies', 'music', 'games', 'tv shows', 'celebrities', 'streaming', 'media', 'fun'],
+            food: ['food', 'restaurant', 'recipe', 'cooking', 'cuisine', 'meal', 'dining', 'chef', 'kitchen', 'culinary', 'foodie', 'food delivery', 'catering']
+        };
+
+        // Country and TLD data
+        const countriesData = [
+            { name: "USA", codes: ["us", "com"] },
+            { name: "UK", codes: ["uk", "co.uk"] },
+            { name: "Canada", codes: ["ca"] },
+            { name: "Australia", codes: ["au", "com.au"] },
+            { name: "Germany", codes: ["de"] },
+            { name: "India", codes: ["in", "co.in"] },
+            { name: "France", codes: ["fr"] },
+            { name: "Japan", codes: ["jp", "co.jp"] },
+            { name: "China", codes: ["cn", "com.cn"] },
+            { name: "Brazil", codes: ["br", "com.br"] }
+        ].sort((a, b) => a.name.localeCompare(b.name));
+
+        const tldList = [
+            ".com", ".net", ".org", ".co", ".io", ".ai", ".app", ".dev", ".tech", ".store",
+            ".co.uk", ".ca", ".de", ".au", ".in", ".us", ".fr", ".jp", ".cn", ".br"
+        ].sort();
+
+        // Global variables
+        let allResults = [];
+        let filteredResults = [];
+        let categorySummary = {};
+        let currentTheme = 'light';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeFilters();
+            setupEventListeners();
+            loadTheme();
+        });
+
+        function initializeFilters() {
+            // Populate country filters
+            const countryContainer = document.getElementById('countryFilters');
+            countriesData.forEach(country => {
+                const filterItem = document.createElement('div');
+                filterItem.className = 'filter-item';
+                filterItem.innerHTML = `
+                    <input type="checkbox" id="country-${country.name}" class="filter-checkbox country-checkbox" value="${country.name}">
+                    <label for="country-${country.name}" class="filter-label">${country.name}</label>
+                `;
+                countryContainer.appendChild(filterItem);
+            });
+
+            // Populate TLD filters
+            const tldContainer = document.getElementById('tldFilters');
+            tldList.forEach(tld => {
+                const filterItem = document.createElement('div');
+                filterItem.className = 'filter-item';
+                filterItem.innerHTML = `
+                    <input type="checkbox" id="tld-${tld.replace('.', '')}" class="filter-checkbox tld-checkbox" value="${tld}">
+                    <label for="tld-${tld.replace('.', '')}" class="filter-label">${tld}</label>
+                `;
+                tldContainer.appendChild(filterItem);
+            });
+        }
+
+        function setupEventListeners() {
+            // File upload
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    handleFileSelect();
+                }
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', filterResults);
+        }
+
+        function handleFileSelect() {
+            const file = document.getElementById('fileInput').files[0];
+            if (file) {
+                document.querySelector('.upload-area h3').textContent = `Selected: ${file.name}`;
+                document.querySelector('.upload-area p').textContent = `File size: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+
+            const themeIcon = document.getElementById('themeIcon');
+            themeIcon.className = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+
+            // Save theme preference
+            localStorage.setItem('theme', currentTheme);
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            currentTheme = savedTheme;
+            document.documentElement.setAttribute('data-theme', currentTheme);
+
+            const themeIcon = document.getElementById('themeIcon');
+            themeIcon.className = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        function getTldFromUrl(url) {
+            if (!url) return '';
+            try {
+                let tempUrl = url;
+                if (!tempUrl.match(/^https?:\/\//)) {
+                    tempUrl = 'https://' + tempUrl;
+                }
+                const hostname = new URL(tempUrl).hostname;
+                const parts = hostname.split('.');
+                if (parts.length < 2) return '';
+
+                // Handle common second-level domains
+                const commonSLDs = ['co', 'com', 'org', 'net', 'gov', 'edu'];
+                if (parts.length > 2 && commonSLDs.includes(parts[parts.length - 2])) {
+                    return `.${parts[parts.length - 2]}.${parts[parts.length - 1]}`;
+                }
+                return `.${parts[parts.length - 1]}`;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function detectCategory(url, content = '') {
+            const normalizedUrl = url.toLowerCase();
+            const normalizedContent = content.toLowerCase();
+            const detectedCategories = new Set();
+
+            for (const [category, keywords] of Object.entries(categoryKeywords)) {
+                for (const keyword of keywords) {
+                    if (normalizedUrl.includes(keyword) || normalizedContent.includes(keyword)) {
+                        detectedCategories.add(category);
+                    }
+                }
+            }
+
+            return detectedCategories.size > 0 ? Array.from(detectedCategories) : ['uncategorized'];
+        }
+
+        function getCategoryDisplayName(category) {
+            const displayNames = {
+                // Priority Category
+                software: 'Software & SaaS',
+
+                // Key Business Areas
+                digitalmarketing: 'Digital Marketing & SEO',
+                businessfinance: 'Business & Finance',
+                realestate: 'Real Estate',
+                automotive: 'Automotive',
+                homeimprovement: 'Home Improvement & Gardening',
+
+                // Website Purpose/Structure
+                blogGuestPosting: 'Blog / Guest Posting',
+                serviceBased: 'Service-Based',
+                ecommerce: 'E-commerce',
+
+                // General Categories
+                business: 'Business',
+                tech: 'Tech',
+                fashion: 'Fashion',
+                sports: 'Sports',
+                travel: 'Travel',
+                crypto: 'Crypto',
+                finance: 'Finance',
+                education: 'Education',
+                health: 'Health',
+                law: 'Law',
+                lifestyle: 'Lifestyle',
+                wedding: 'Wedding',
+                pets: 'Pets',
+                photography: 'Photography',
+                entertainment: 'Entertainment',
+                food: 'Food',
+                uncategorized: 'Uncategorized'
+            };
+            return displayNames[category] || category.charAt(0).toUpperCase() + category.slice(1);
+        }
+
+        function processData() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showModal('Please select a file to upload.', 'File Required');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const minTraffic = parseInt(document.getElementById('minTraffic').value) || 0;
+            const maxTraffic = parseInt(document.getElementById('maxTraffic').value) || Number.MAX_SAFE_INTEGER;
+
+            // Get selected filters
+            const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => cb.id);
+            const selectedCountries = Array.from(document.querySelectorAll('.country-checkbox:checked')).map(cb => cb.value);
+            const selectedTlds = Array.from(document.querySelectorAll('.tld-checkbox:checked')).map(cb => cb.value);
+
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+                    allResults = [];
+
+                    jsonData.forEach(row => {
+                        let url = '', traffic = 0, content = '';
+
+                        // Extract data from row
+                        for (const key of Object.keys(row)) {
+                            const lKey = key.toLowerCase();
+                            if (lKey.includes('domain') || lKey.includes('url') || lKey.includes('website')) {
+                                url = String(row[key]).trim();
+                            }
+                            if (lKey.includes('traffic') || lKey.includes('organic traffic') || lKey.includes('visitors')) {
+                                traffic = parseInt(row[key]) || 0;
+                            }
+                            if (lKey.includes('description') || lKey.includes('content') || lKey.includes('keywords')) {
+                                content += String(row[key]) + ' ';
+                            }
+                        }
+
+                        if (!url || traffic < minTraffic || traffic > maxTraffic) return;
+
+                        const categories = detectCategory(url, content.trim());
+                        const tld = getTldFromUrl(url);
+
+                        // Apply filters
+                        if (selectedCategories.length > 0 && !selectedCategories.some(sc => categories.includes(sc))) return;
+
+                        if (selectedCountries.length > 0) {
+                            const matchesCountry = selectedCountries.some(country => {
+                                const countryData = countriesData.find(c => c.name === country);
+                                return countryData && countryData.codes.some(code => tld.includes(code));
+                            });
+                            if (!matchesCountry) return;
+                        }
+
+                        if (selectedTlds.length > 0 && !selectedTlds.includes(tld)) return;
+
+                        allResults.push({
+                            url,
+                            traffic,
+                            categories,
+                            tld,
+                            content: content.trim()
+                        });
+                    });
+
+                    // Sort by traffic (highest first)
+                    allResults.sort((a, b) => b.traffic - a.traffic);
+                    filteredResults = [...allResults];
+
+                    // Hide loading and show results
+                    document.getElementById('loading').classList.remove('show');
+                    displayResults();
+
+                } catch (error) {
+                    document.getElementById('loading').classList.remove('show');
+                    console.error('Error processing file:', error);
+                    showModal(`Error processing file: ${error.message}`, 'Processing Error');
+                }
+            };
+
+            reader.onerror = () => {
+                document.getElementById('loading').classList.remove('show');
+                showModal('Error reading file.', 'File Error');
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function displayResults() {
+            // Update statistics
+            updateStatistics();
+
+            // Create category summary
+            createCategorySummary();
+
+            // Display results table
+            displayResultsTable();
+
+            // Show results section
+            document.getElementById('resultsSection').classList.add('show');
+        }
+
+        function updateStatistics() {
+            const totalWebsites = filteredResults.length;
+            const totalTraffic = filteredResults.reduce((sum, site) => sum + site.traffic, 0);
+            const avgTraffic = totalWebsites > 0 ? Math.round(totalTraffic / totalWebsites) : 0;
+
+            // Find top category
+            const categoryCount = {};
+            filteredResults.forEach(site => {
+                site.categories.forEach(cat => {
+                    categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+                });
+            });
+            const topCategory = Object.keys(categoryCount).reduce((a, b) =>
+                categoryCount[a] > categoryCount[b] ? a : b, 'None');
+
+            document.getElementById('totalWebsites').textContent = totalWebsites.toLocaleString();
+            document.getElementById('totalTraffic').textContent = totalTraffic.toLocaleString();
+            document.getElementById('avgTraffic').textContent = avgTraffic.toLocaleString();
+            document.getElementById('topCategory').textContent = getCategoryDisplayName(topCategory);
+        }
+
+        function createCategorySummary() {
+            categorySummary = {};
+            filteredResults.forEach(site => {
+                site.categories.forEach(cat => {
+                    categorySummary[cat] = (categorySummary[cat] || 0) + 1;
+                });
+            });
+
+            const categoryTagsContainer = document.getElementById('categoryTags');
+            categoryTagsContainer.innerHTML = '';
+
+            Object.entries(categorySummary)
+                .sort((a, b) => b[1] - a[1])
+                .forEach(([category, count]) => {
+                    const tag = document.createElement('span');
+                    tag.className = 'category-tag';
+                    tag.textContent = `${getCategoryDisplayName(category)}: ${count}`;
+                    tag.dataset.category = category;
+                    tag.addEventListener('click', () => filterByCategory(category));
+                    categoryTagsContainer.appendChild(tag);
+                });
+        }
+
+        function displayResultsTable() {
+            const tableBody = document.getElementById('resultsTable');
+            tableBody.innerHTML = '';
+
+            if (filteredResults.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No websites found matching your criteria.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filteredResults.forEach(site => {
+                const row = document.createElement('tr');
+                let fullUrl = site.url;
+                if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+                    fullUrl = 'https://' + fullUrl;
+                }
+
+                row.innerHTML = `
+                    <td>
+                        <a href="${fullUrl}" target="_blank" class="website-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            ${site.url}
+                        </a>
+                    </td>
+                    <td class="traffic-value">${site.traffic.toLocaleString()}</td>
+                    <td>
+                        <div class="category-badges">
+                            ${site.categories.map(cat =>
+                    `<span class="category-badge">${getCategoryDisplayName(cat)}</span>`
+                ).join('')}
+                        </div>
+                    </td>
+                    <td>${site.tld || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="viewDetails('${site.url}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                            <i class="fas fa-info-circle"></i>
+                            Details
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function filterByCategory(category) {
+            // Update active state
+            document.querySelectorAll('.category-tag').forEach(tag => {
+                tag.classList.toggle('active', tag.dataset.category === category);
+            });
+
+            // Filter results
+            filteredResults = allResults.filter(site => site.categories.includes(category));
+
+            // Update display
+            displayResultsTable();
+            updateStatistics();
+
+            // Show clear filter button
+            document.getElementById('clearCategoryFilter').style.display = 'block';
+        }
+
+        function clearCategoryFilter() {
+            document.querySelectorAll('.category-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+
+            filteredResults = [...allResults];
+            displayResultsTable();
+            updateStatistics();
+
+            document.getElementById('clearCategoryFilter').style.display = 'none';
+        }
+
+        function filterResults() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allResults.filter(site =>
+                site.url.toLowerCase().includes(searchTerm) ||
+                site.categories.some(cat => getCategoryDisplayName(cat).toLowerCase().includes(searchTerm))
+            );
+
+            filteredResults = filtered;
+            displayResultsTable();
+            updateStatistics();
+        }
+
+        function sortResults() {
+            const sortBy = document.getElementById('sortSelect').value;
+
+            switch (sortBy) {
+                case 'traffic-desc':
+                    filteredResults.sort((a, b) => b.traffic - a.traffic);
+                    break;
+                case 'traffic-asc':
+                    filteredResults.sort((a, b) => a.traffic - b.traffic);
+                    break;
+                case 'domain-asc':
+                    filteredResults.sort((a, b) => a.url.localeCompare(b.url));
+                    break;
+                case 'domain-desc':
+                    filteredResults.sort((a, b) => b.url.localeCompare(a.url));
+                    break;
+            }
+
+            displayResultsTable();
+        }
+
+        function downloadResults() {
+            if (filteredResults.length === 0) {
+                showModal('No results to download.', 'Download Info');
+                return;
+            }
+
+            const exportData = filteredResults.map(site => ({
+                URL: site.url,
+                Traffic: site.traffic,
+                Categories: site.categories.map(getCategoryDisplayName).join(', '),
+                'Domain Extension': site.tld,
+                Content: site.content
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "FilteredWebsites");
+            XLSX.writeFile(wb, "website_analysis_results.xlsx");
+        }
+
+        function viewDetails(url) {
+            const site = filteredResults.find(s => s.url === url);
+            if (site) {
+                const details = `
+                    <strong>URL:</strong> ${site.url}<br>
+                    <strong>Traffic:</strong> ${site.traffic.toLocaleString()}<br>
+                    <strong>Categories:</strong> ${site.categories.map(getCategoryDisplayName).join(', ')}<br>
+                    <strong>Domain Extension:</strong> ${site.tld}<br>
+                    <strong>Content Preview:</strong> ${site.content.substring(0, 200)}...
+                `;
+                showModal(details, 'Website Details');
+            }
+        }
+
+        // Utility functions
+        function selectAllCountries() {
+            document.querySelectorAll('.country-checkbox').forEach(cb => cb.checked = true);
+        }
+
+        function unselectAllCountries() {
+            document.querySelectorAll('.country-checkbox').forEach(cb => cb.checked = false);
+        }
+
+        function selectAllTlds() {
+            document.querySelectorAll('.tld-checkbox').forEach(cb => cb.checked = true);
+        }
+
+        function unselectAllTlds() {
+            document.querySelectorAll('.tld-checkbox').forEach(cb => cb.checked = false);
+        }
+
+        function showModal(message, title = 'Notification') {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').innerHTML = message;
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (e) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+
+            if (window.innerWidth <= 1024 &&
+                !sidebar.contains(e.target) &&
+                !sidebarToggle.contains(e.target) &&
+                sidebar.classList.contains('show')) {
+                sidebar.classList.remove('show');
+            }
+        });
+    
+
+    
+        // <![CDATA[  <-- For SVG support
+        if ('WebSocket' in window) {
+            (function () {
+                function refreshCSS() {
+                    var sheets = [].slice.call(document.getElementsByTagName("link"));
+                    var head = document.getElementsByTagName("head")[0];
+                    for (var i = 0; i < sheets.length; ++i) {
+                        var elem = sheets[i];
+                        var parent = elem.parentElement || head;
+                        parent.removeChild(elem);
+                        var rel = elem.rel;
+                        if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+                        }
+                        parent.appendChild(elem);
+                    }
+                }
+                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+                var address = protocol + window.location.host + window.location.pathname + '/ws';
+                var socket = new WebSocket(address);
+                socket.onmessage = function (msg) {
+                    if (msg.data == 'reload') window.location.reload();
+                    else if (msg.data == 'refreshcss') refreshCSS();
+                };
+                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+                    console.log('Live reload enabled.');
+                    sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+                }
+            })();
+        }
+        else {
+            console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+        }
+        // ]]>
+    
+
+    
+        // <![CDATA[  <-- For SVG support
+        if ('WebSocket' in window) {
+            (function () {
+                function refreshCSS() {
+                    var sheets = [].slice.call(document.getElementsByTagName("link"));
+                    var head = document.getElementsByTagName("head")[0];
+                    for (var i = 0; i < sheets.length; ++i) {
+                        var elem = sheets[i];
+                        var parent = elem.parentElement || head;
+                        parent.removeChild(elem);
+                        var rel = elem.rel;
+                        if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+                        }
+                        parent.appendChild(elem);
+                    }
+                }
+                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+                var address = protocol + window.location.host + window.location.pathname + '/ws';
+                var socket = new WebSocket(address);
+                socket.onmessage = function (msg) {
+                    if (msg.data == 'reload') window.location.reload();
+                    else if (msg.data == 'refreshcss') refreshCSS();
+                };
+                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+                    console.log('Live reload enabled.');
+                    sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+                }
+            })();
+        }
+        else {
+            console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+        }
+        // ]]>
+    
+
+    
+        // <![CDATA[  <-- For SVG support
+        if ('WebSocket' in window) {
+            (function () {
+                function refreshCSS() {
+                    var sheets = [].slice.call(document.getElementsByTagName("link"));
+                    var head = document.getElementsByTagName("head")[0];
+                    for (var i = 0; i < sheets.length; ++i) {
+                        var elem = sheets[i];
+                        var parent = elem.parentElement || head;
+                        parent.removeChild(elem);
+                        var rel = elem.rel;
+                        if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+                        }
+                        parent.appendChild(elem);
+                    }
+                }
+                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+                var address = protocol + window.location.host + window.location.pathname + '/ws';
+                var socket = new WebSocket(address);
+                socket.onmessage = function (msg) {
+                    if (msg.data == 'reload') window.location.reload();
+                    else if (msg.data == 'refreshcss') refreshCSS();
+                };
+                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+                    console.log('Live reload enabled.');
+                    sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+                }
+            })();
+        }
+        else {
+            console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+        }
+        // ]]>
+    
+
+    
+        // <![CDATA[  <-- For SVG support
+        if ('WebSocket' in window) {
+            (function () {
+                function refreshCSS() {
+                    var sheets = [].slice.call(document.getElementsByTagName("link"));
+                    var head = document.getElementsByTagName("head")[0];
+                    for (var i = 0; i < sheets.length; ++i) {
+                        var elem = sheets[i];
+                        var parent = elem.parentElement || head;
+                        parent.removeChild(elem);
+                        var rel = elem.rel;
+                        if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+                        }
+                        parent.appendChild(elem);
+                    }
+                }
+                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+                var address = protocol + window.location.host + window.location.pathname + '/ws';
+                var socket = new WebSocket(address);
+                socket.onmessage = function (msg) {
+                    if (msg.data == 'reload') window.location.reload();
+                    else if (msg.data == 'refreshcss') refreshCSS();
+                };
+                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+                    console.log('Live reload enabled.');
+                    sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+                }
+            })();
+        }
+        else {
+            console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+        }
+        // ]]>
+    
+    
+    
+        // <![CDATA[  <-- For SVG support
+        if ('WebSocket' in window) {
+            (function () {
+                function refreshCSS() {
+                    var sheets = [].slice.call(document.getElementsByTagName("link"));
+                    var head = document.getElementsByTagName("head")[0];
+                    for (var i = 0; i < sheets.length; ++i) {
+                        var elem = sheets[i];
+                        var parent = elem.parentElement || head;
+                        parent.removeChild(elem);
+                        var rel = elem.rel;
+                        if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+                        }
+                        parent.appendChild(elem);
+                    }
+                }
+                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+                var address = protocol + window.location.host + window.location.pathname + '/ws';
+                var socket = new WebSocket(address);
+                socket.onmessage = function (msg) {
+                    if (msg.data == 'reload') window.location.reload();
+                    else if (msg.data == 'refreshcss') refreshCSS();
+                };
+                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+                    console.log('Live reload enabled.');
+                    sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+                }
+            })();
+        }
+        else {
+            console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+        }
+        // ]]>
+    
+
+
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	
+</script>
+</html>
