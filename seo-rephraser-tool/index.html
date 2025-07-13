@@ -3,60 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEO Content Rephraser & Structure Generator</title>
+    <title>Advanced SEO Content Tool</title>
     <link rel="stylesheet" href="style.css">
     <!-- CDN Libraries for document export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.1.0/docx.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="../auth-guard.js"></script>
-    <script src="../resource-protection.js"></script>
+    <!-- <script src="../resource-protection.js"></script> -->
 </head>
 <body>
     <div class="container">
-        <h1>SEO Content Rephraser & Structure Generator</h1>
+        <header class="main-header">
+            <h1>Advanced SEO Content Tool</h1>
+            <p>Rephrase, Structure, and Optimize Your Content Like a Pro</p>
+        </header>
 
         <div class="input-section">
-            <label for="main-content">Main Content:</label>
-            <textarea id="main-content" placeholder="Paste your content here..."></textarea>
+            <label for="main-content">Your Original Content:</label>
+            <textarea id="main-content" placeholder="Start by pasting your content here..."></textarea>
             <div class="content-stats">
                 Word Count: <span id="word-count">0</span> | Character Count: <span id="char-count">0</span> | Reading Time: <span id="reading-time">0 min</span>
             </div>
         </div>
 
-        <div class="input-section">
-            <label for="main-keyword">Main Keyword:</label>
-            <input type="text" id="main-keyword" placeholder="Enter main keyword">
-        </div>
-
-        <div class="input-section">
-            <label for="secondary-keywords">Secondary Keywords:</label>
-            <div id="secondary-keywords-chips" class="chips-container"></div>
-            <input type="text" id="secondary-keyword-input" placeholder="Add secondary keywords (press Enter)">
-        </div>
-
-        <div class="input-section">
-            <label>Keyword Density Controls:</label>
-            <div class="density-controls">
-                Min: <input type="number" id="min-density" value="0.5" step="0.1">%
-                Max: <input type="number" id="max-density" value="0.8" step="0.1">%
+        <div class="controls-grid">
+            <div class="input-section">
+                <label for="main-keyword">Main Keyword:</label>
+                <input type="text" id="main-keyword" placeholder="e.g., 'digital marketing'">
             </div>
+
+            <div class="input-section">
+                <label for="secondary-keyword-input">Secondary Keywords (Press Enter to add ):</label>
+                <input type="text" id="secondary-keyword-input" placeholder="e.g., 'social media', 'seo'">
+                <div id="secondary-keywords-chips" class="chips-container"></div>
+            </div>
+        </div>
+
+        <div class="input-section density-section">
+            <label>Live Keyword Density:</label>
             <div class="density-meter">
-                Live Density: <span id="live-density">0.00%</span>
+                <span id="live-density">0.00%</span>
+            </div>
+            <div class="density-controls">
+                <span>Target Range:</span>
+                <input type="number" id="min-density" value="0.5" step="0.1">%
+                <span>to</span>
+                <input type="number" id="max-density" value="0.8" step="0.1">%
             </div>
         </div>
 
-        <button id="rephrase-button">Rephrase Content</button>
+        <button id="rephrase-button">✨ Generate Enhanced Content</button>
         <div id="loader" class="loader"></div>
 
         <div class="output-section">
-            <h2>Rephrased Content:</h2>
-            <div id="rephrased-content"></div>
+            <div class="output-header">
+                <h2>Rephrased Content (Humanized & SEO-Friendly)</h2>
+                <div class="action-buttons">
+                    <button class="action-btn" id="select-rephrased">Select All</button>
+                    <button class="action-btn" id="copy-rephrased">Copy All</button>
+                </div>
+            </div>
+            <div id="rephrased-content" class="output-box"></div>
         </div>
 
         <div class="output-section">
-            <h2>Structured SEO Content:</h2>
-            <div id="structured-content"></div>
+            <div class="output-header">
+                <h2>Optimized SEO Structure</h2>
+                <div class="action-buttons">
+                    <button class="action-btn" id="select-structured">Select All</button>
+                    <button class="action-btn" id="copy-structured">Copy All</button>
+                </div>
+            </div>
+            <div id="structured-content" class="output-box"></div>
         </div>
 
         <div class="export-buttons">
@@ -68,4 +87,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-

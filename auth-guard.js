@@ -183,7 +183,7 @@
         addUserInfoToPage() {
             // Check if user info already exists
             if (document.getElementById('user-info-bar')) return;
-
+           const homeURL = window.location.origin + "/index.html";
             const userInfoBar = document.createElement('div');
             userInfoBar.id = 'user-info-bar';
             userInfoBar.innerHTML = `
@@ -204,7 +204,7 @@
                     font-size: 0.9rem;
                 ">
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <a href="${AUTH_CONFIG.HOME_URL}" style="
+                        <a href="${homeURL}" style="
                             color: white;
                             text-decoration: none;
                             font-weight: 600;
