@@ -343,11 +343,10 @@
             });
 
             // Prevent text selection
-            document.addEventListener('selectstart', (e) => {
-                e.preventDefault();
-                return false;
-            });
-
+           // document.addEventListener('selectstart', (e) => {
+            //     e.preventDefault();
+            //     return false;
+            // });
             // Prevent drag
             document.addEventListener('dragstart', (e) => {
                 e.preventDefault();
