@@ -7,7 +7,7 @@
     <title>Ahrefs Niche Finder - Content Explorer Analytics</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-      <script src="auth-guard.js"></script>
+     <script src="auth-guard.js"></script>
     <script src="resource-protection.js"></script>
     <style>
         * {
@@ -511,6 +511,21 @@
             font-size: 0.875rem;
         }
 
+        /* Category Control Buttons */
+        .category-control-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .category-control-buttons .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            flex: 1;
+            min-width: 120px;
+        }
+
         /* Results Section */
         .results-section {
             display: none;
@@ -961,9 +976,13 @@
                         <h4 style="margin-bottom: 1rem; color: #b8860b; font-weight: 600;">
                             <i class="fas fa-star"></i> Priority Category
                         </h4>
+                        <div class="category-control-buttons">
+                            <button class="btn btn-secondary" onclick="selectAllInGroup('priority-category')">Select All</button>
+                            <button class="btn btn-secondary" onclick="deselectAllInGroup('priority-category')">Deselect All</button>
+                        </div>
                         <div class="filter-grid">
                             <div class="filter-item">
-                                <input type="checkbox" id="software" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="software" class="filter-checkbox category-checkbox priority-category-checkbox" checked>
                                 <label for="software" class="filter-label">💻 Software & SaaS</label>
                             </div>
                         </div>
@@ -974,32 +993,42 @@
                         <h4 style="margin-bottom: 1rem; color: var(--primary-color); font-weight: 600;">
                             <i class="fas fa-briefcase"></i> Key Business Areas
                         </h4>
+                        <div class="category-control-buttons">
+                            <button class="btn btn-secondary" onclick="selectAllInGroup('key-business-areas')">Select All</button>
+                            <button class="btn btn-secondary" onclick="deselectAllInGroup('key-business-areas')">Deselect All</button>
+                        </div>
                         <div class="filter-grid">
                             <div class="filter-item">
-                                <input type="checkbox" id="digitalmarketing" class="filter-checkbox category-checkbox"
-                                    checked>
+                                <input type="checkbox" id="digitalmarketing" class="filter-checkbox category-checkbox key-business-areas-checkbox" checked>
                                 <label for="digitalmarketing" class="filter-label">📈 Digital Marketing & SEO</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="businessfinance" class="filter-checkbox category-checkbox"
-                                    checked>
+                                <input type="checkbox" id="businessfinance" class="filter-checkbox category-checkbox key-business-areas-checkbox" checked>
                                 <label for="businessfinance" class="filter-label">🏢 Business & Finance</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="realestate" class="filter-checkbox category-checkbox"
-                                    checked>
+                                <input type="checkbox" id="realestate" class="filter-checkbox category-checkbox key-business-areas-checkbox" checked>
                                 <label for="realestate" class="filter-label">🏠 Real Estate</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="automotive" class="filter-checkbox category-checkbox"
-                                    checked>
+                                <input type="checkbox" id="automotive" class="filter-checkbox category-checkbox key-business-areas-checkbox" checked>
                                 <label for="automotive" class="filter-label">🚗 Automotive</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="homeimprovement" class="filter-checkbox category-checkbox"
-                                    checked>
-                                <label for="homeimprovement" class="filter-label">🏡 Home Improvement &
-                                    Gardening</label>
+                                <input type="checkbox" id="homeimprovement" class="filter-checkbox category-checkbox key-business-areas-checkbox" checked>
+                                <label for="homeimprovement" class="filter-label">🏡 Home Improvement & Gardening</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="construction" class="filter-checkbox category-checkbox key-business-areas-checkbox" checked>
+                                <label for="construction" class="filter-label">🏗️ Construction & Engineering</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="manufacturing" class="filter-checkbox category-checkbox key-business-areas-checkbox" checked>
+                                <label for="manufacturing" class="filter-label">🏭 Manufacturing & Industrial</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="logistics" class="filter-checkbox category-checkbox key-business-areas-checkbox" checked>
+                                <label for="logistics" class="filter-label">🚚 Logistics & Supply Chain</label>
                             </div>
                         </div>
                     </div>
@@ -1009,18 +1038,30 @@
                         <h4 style="margin-bottom: 1rem; color: var(--success-color); font-weight: 600;">
                             <i class="fas fa-globe"></i> Website Purpose/Structure
                         </h4>
+                        <div class="category-control-buttons">
+                            <button class="btn btn-secondary" onclick="selectAllInGroup('website-purpose')">Select All</button>
+                            <button class="btn btn-secondary" onclick="deselectAllInGroup('website-purpose')">Deselect All</button>
+                        </div>
                         <div class="filter-grid">
                             <div class="filter-item">
-                                <input type="checkbox" id="blogGuestPosting" class="filter-checkbox category-checkbox">
+                                <input type="checkbox" id="blogGuestPosting" class="filter-checkbox category-checkbox website-purpose-checkbox">
                                 <label for="blogGuestPosting" class="filter-label">📝 Blog / Guest Posting</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="serviceBased" class="filter-checkbox category-checkbox">
+                                <input type="checkbox" id="serviceBased" class="filter-checkbox category-checkbox website-purpose-checkbox">
                                 <label for="serviceBased" class="filter-label">🛠️ Service-Based</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="ecommerce" class="filter-checkbox category-checkbox">
+                                <input type="checkbox" id="ecommerce" class="filter-checkbox category-checkbox website-purpose-checkbox">
                                 <label for="ecommerce" class="filter-label">🛒 E-commerce</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="marketplace" class="filter-checkbox category-checkbox website-purpose-checkbox">
+                                <label for="marketplace" class="filter-label">🏪 Marketplace</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="portfolio" class="filter-checkbox category-checkbox website-purpose-checkbox">
+                                <label for="portfolio" class="filter-label">🎨 Portfolio & Showcase</label>
                             </div>
                         </div>
                     </div>
@@ -1031,88 +1072,126 @@
                             <i class="fas fa-th-large"></i>
                             General Categories
                         </h3>
+                        <div class="category-control-buttons">
+                            <button class="btn btn-secondary" onclick="selectAllInGroup('general-categories')">Select All</button>
+                            <button class="btn btn-secondary" onclick="deselectAllInGroup('general-categories')">Deselect All</button>
+                        </div>
                         <div class="filter-grid">
                             <div class="filter-item">
-                                <input type="checkbox" id="business" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="business" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="business" class="filter-label">💼 Business</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="tech" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="tech" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="tech" class="filter-label">⚙️ Tech</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="fashion" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="fashion" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="fashion" class="filter-label">👗 Fashion</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="sports" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="sports" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="sports" class="filter-label">⚽ Sports</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="travel" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="travel" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="travel" class="filter-label">✈️ Travel</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="crypto" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="crypto" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="crypto" class="filter-label">₿ Crypto</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="finance" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="finance" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="finance" class="filter-label">💰 Finance</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="education" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="education" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="education" class="filter-label">📚 Education</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="health" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="health" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="health" class="filter-label">🏥 Health</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="law" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="law" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="law" class="filter-label">⚖️ Law</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="lifestyle" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="lifestyle" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="lifestyle" class="filter-label">⭐ Lifestyle</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="wedding" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="wedding" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="wedding" class="filter-label">💒 Wedding</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="pets" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="pets" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="pets" class="filter-label">🐾 Pets</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="photography" class="filter-checkbox category-checkbox"
-                                    checked>
+                                <input type="checkbox" id="photography" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="photography" class="filter-label">📸 Photography</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="entertainment" class="filter-checkbox category-checkbox"
-                                    checked>
+                                <input type="checkbox" id="entertainment" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="entertainment" class="filter-label">🎬 Entertainment</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="food" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="food" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="food" class="filter-label">🍕 Food</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="gaming" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="gaming" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="gaming" class="filter-label">🎮 Gaming</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="apk" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="apk" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="apk" class="filter-label">📱 APK</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="ios" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="ios" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="ios" class="filter-label">🍎 iOS</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="adult" class="filter-checkbox category-checkbox" checked>
+                                <input type="checkbox" id="adult" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
                                 <label for="adult" class="filter-label">🔞 Adult</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="news" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
+                                <label for="news" class="filter-label">📰 News & Media</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="science" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
+                                <label for="science" class="filter-label">🔬 Science & Research</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="art" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
+                                <label for="art" class="filter-label">🎨 Art & Design</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="music" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
+                                <label for="music" class="filter-label">🎵 Music</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="books" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
+                                <label for="books" class="filter-label">📖 Books & Literature</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="nonprofit" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
+                                <label for="nonprofit" class="filter-label">🤝 Non-Profit & Charity</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="government" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
+                                <label for="government" class="filter-label">🏛️ Government & Politics</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="religion" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
+                                <label for="religion" class="filter-label">⛪ Religion & Spirituality</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="others" class="filter-checkbox category-checkbox general-categories-checkbox" checked>
+                                <label for="others" class="filter-label">❓ Others</label>
                             </div>
                         </div>
                     </div>
@@ -1313,7 +1392,7 @@
     </div>
 
     <script>
-        // Enhanced category keywords with more comprehensive detection
+        // Enhanced category keywords with more comprehensive detection and new categories
         const categoryKeywords = {
             // Priority Category
             software: ["software", "saas", "app", "platform", "tool", "cloud", "api", "dashboard", "crm", "erp", "automation", "integration", "system", "solution", "download", "tech solution", "application", "program", "software development", "web app", "mobile app", "enterprise software", "productivity tool", "cybersecurity", "data management", "analytics platform"],
@@ -1324,11 +1403,16 @@
             realestate: ["real estate", "property", "homes", "houses", "apartments", "condos", "rental", "mortgage", "realtor", "mls", "listing", "buy home", "sell home", "rent", "lease", "commercial property", "land development", "property management", "real estate investment", "housing market", "brokerage", "appraisal"],
             automotive: ["automotive", "cars", "auto", "vehicle", "truck", "motorcycle", "parts", "repair", "dealership", "used cars", "new cars", "car insurance", "auto loan", "electric vehicles", "car reviews", "auto sales", "mechanic", "car accessories", "tuning", "classic cars"],
             homeimprovement: ["home improvement", "gardening", "landscaping", "renovation", "remodeling", "diy", "tools", "hardware", "garden", "plants", "lawn care", "interior design", "construction", "plumbing", "electrical", "roofing", "painting", "kitchen remodel", "bathroom remodel", "sustainable living", "home decor"],
+            construction: ["construction", "engineering", "building", "contractor", "architecture", "civil engineering", "structural engineering", "project management", "heavy machinery", "excavation", "foundation", "concrete", "steel", "infrastructure", "commercial construction", "residential construction", "road construction", "bridge construction"],
+            manufacturing: ["manufacturing", "industrial", "factory", "production", "assembly", "machinery", "equipment", "supply chain", "quality control", "lean manufacturing", "automation", "robotics", "industrial design", "process optimization", "industrial equipment", "heavy industry", "chemical manufacturing", "textile manufacturing"],
+            logistics: ["logistics", "supply chain", "shipping", "freight", "transportation", "warehouse", "distribution", "delivery", "cargo", "fleet management", "inventory management", "third party logistics", "fulfillment", "courier", "express delivery", "international shipping", "customs", "import export"],
 
             // Website Purpose/Structure
             blogGuestPosting: ["blog", "blogs", "article", "articles", "news", "insights", "updates", "guest post", "write for us", "contribute", "editorial", "submissions", "author guidelines", "content hub", "latest posts", "our blog", "publication", "stories", "journal", "magazine", "column", "opinion", "commentary", "press release", "publishing platform"],
             serviceBased: ["services", "solutions", "consulting", "agency", "hire us", "our work", "portfolio", "request quote", "pricing", "packages", "offerings", "capabilities", "expertise", "get started", "contact us for services", "managed services", "professional services", "our services", "book a demo", "schedule consultation", "support", "maintenance", "installation", "repair services", "custom solutions", "on-demand service"],
             ecommerce: ["shop", "store", "cart", "checkout", "buy now", "products", "add to cart", "catalog", "sale", "online store", "marketplace", "e-shop", "browse products", "view cart", "order", "wishlist", "my account", "new arrivals", "bestsellers", "collections", "deals", "discounts", "shipping", "payment gateway", "product reviews", "shopping cart", "online retail", "dropshipping"],
+            marketplace: ["marketplace", "multi-vendor", "seller", "vendor", "commission", "listing fee", "product listing", "seller dashboard", "buyer protection", "escrow", "rating system", "review system", "seller verification", "marketplace platform", "online marketplace", "digital marketplace", "b2b marketplace", "c2c marketplace"],
+            portfolio: ["portfolio", "showcase", "gallery", "work samples", "case studies", "projects", "creative work", "design portfolio", "photography portfolio", "artist portfolio", "freelancer portfolio", "agency portfolio", "personal website", "creative showcase", "professional portfolio"],
 
             // General Categories
             business: ["business", "company", "corporate", "enterprise", "startup", "entrepreneur", "industry", "commerce", "trade", "management", "strategy", "corporation", "small business", "b2b", "b2c", "franchise", "investment opportunities", "market analysis", "business development"],
@@ -1351,7 +1435,19 @@
             apk: ["apk", "android app", "android game", "apk download", "mod apk", "apk mirror", "android application package", "mobile app download", "android software", "apk installer", "android updates", "android tips", "android tricks", "android customization"],
             ios: ["ios", "iphone app", "ipad app", "apple app", "ios game", "app store", "ios download", "apple software", "ios updates", "ios tips", "ios tricks", "ios development", "apple ecosystem", "mac app", "apple watch app"],
             adult: ["porn", "adult content", "xxx", "erotic", "mature content", "adult entertainment", "webcam", "dating adult", "adult dating", "onlyfans", "patreon adult", "sex education", "sexual health", "adult toys", "adult films", "adult games", "adult literature", "adult art", "adult community", "adult forum", "adult chat", "adult services", "adult products", "adult dating site", "adult video", "adult website", "adult streaming", "adult subscription", "adult membership", "adult club", "adult store", "adult shop", "adult magazine", "adult comic", "adult animation", "adult cartoon", "adult manga", "adult anime", "adult novel", "adult story", "adult fanfiction", "adult roleplay", "adult vr", "adult ar", "adult ai", "adult chatbot", "adult companion", "adult doll", "adult robot", "adult virtual reality", "adult augmented reality", "adult artificial intelligence"],
-            uncategorized: ["uncategorized"]
+            
+            // New Categories
+            news: ["news", "media", "journalism", "newspaper", "magazine", "breaking news", "current events", "press", "reporter", "editor", "broadcast", "television", "radio", "podcast", "media outlet", "news agency", "correspondent", "headline", "article", "story", "investigation", "interview"],
+            science: ["science", "research", "laboratory", "experiment", "study", "scientific", "biology", "chemistry", "physics", "astronomy", "geology", "environmental science", "climate change", "renewable energy", "sustainability", "innovation", "discovery", "academic research", "peer review", "scientific journal"],
+            art: ["art", "design", "creative", "artist", "designer", "graphic design", "illustration", "painting", "sculpture", "digital art", "fine art", "contemporary art", "modern art", "abstract art", "visual arts", "creative agency", "design studio", "art gallery", "museum", "exhibition"],
+            music: ["music", "musician", "band", "singer", "songwriter", "composer", "album", "song", "concert", "festival", "recording", "studio", "instrument", "guitar", "piano", "drums", "vocals", "melody", "rhythm", "genre", "classical", "jazz", "rock", "pop", "electronic", "hip hop"],
+            books: ["books", "literature", "author", "writer", "novel", "poetry", "publishing", "publisher", "bookstore", "library", "reading", "fiction", "non-fiction", "biography", "memoir", "textbook", "academic book", "bestseller", "book review", "literary", "manuscript", "editing"],
+            nonprofit: ["nonprofit", "charity", "foundation", "donation", "volunteer", "fundraising", "social cause", "humanitarian", "community service", "philanthropy", "non-governmental organization", "ngo", "social impact", "awareness campaign", "advocacy", "social justice", "environmental protection", "human rights"],
+            government: ["government", "politics", "political", "policy", "legislation", "public service", "civic", "democracy", "election", "voting", "campaign", "politician", "senator", "congressman", "mayor", "governor", "president", "municipal", "federal", "state", "local government", "public administration"],
+            religion: ["religion", "religious", "spiritual", "faith", "church", "temple", "mosque", "synagogue", "prayer", "worship", "bible", "quran", "torah", "christianity", "islam", "judaism", "buddhism", "hinduism", "meditation", "pilgrimage", "religious community", "theology", "ministry", "pastor", "priest", "imam"],
+            
+            // Others category for uncategorized items
+            others: ["others", "miscellaneous", "general", "various", "mixed", "diverse", "uncategorized", "unspecified", "other"]
         };
 
         // Country and TLD data
@@ -1410,6 +1506,8 @@
             const detectedCategories = new Set();
 
             for (const [category, keywords] of Object.entries(categoryKeywords)) {
+                if (category === 'others') continue; // Skip 'others' category in detection
+                
                 for (const keyword of keywords) {
                     if (normalizedUrl.includes(keyword) || normalizedContent.includes(keyword)) {
                         detectedCategories.add(category);
@@ -1417,7 +1515,8 @@
                 }
             }
 
-            return detectedCategories.size > 0 ? Array.from(detectedCategories) : ['uncategorized'];
+            // If no categories detected, assign to 'others'
+            return detectedCategories.size > 0 ? Array.from(detectedCategories) : ['others'];
         }
 
         function getCategoryDisplayName(category) {
@@ -1431,11 +1530,16 @@
                 realestate: 'Real Estate',
                 automotive: 'Automotive',
                 homeimprovement: 'Home Improvement & Gardening',
+                construction: 'Construction & Engineering',
+                manufacturing: 'Manufacturing & Industrial',
+                logistics: 'Logistics & Supply Chain',
 
                 // Website Purpose/Structure
                 blogGuestPosting: 'Blog / Guest Posting',
                 serviceBased: 'Service-Based',
                 ecommerce: 'E-commerce',
+                marketplace: 'Marketplace',
+                portfolio: 'Portfolio & Showcase',
 
                 // General Categories
                 business: 'Business',
@@ -1458,9 +1562,34 @@
                 apk: 'APK',
                 ios: 'iOS',
                 adult: 'Adult',
-                uncategorized: 'Uncategorized'
+                news: 'News & Media',
+                science: 'Science & Research',
+                art: 'Art & Design',
+                music: 'Music',
+                books: 'Books & Literature',
+                nonprofit: 'Non-Profit & Charity',
+                government: 'Government & Politics',
+                religion: 'Religion & Spirituality',
+                others: 'Others'
             };
             return displayNames[category] || category.charAt(0).toUpperCase() + category.slice(1);
+        }
+
+        // Select/Deselect functions for category groups
+        function selectAllInGroup(groupClass) {
+            const checkboxes = document.querySelectorAll(`.${groupClass}-checkbox`);
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            if (allResults.length > 0) processData();
+        }
+
+        function deselectAllInGroup(groupClass) {
+            const checkboxes = document.querySelectorAll(`.${groupClass}-checkbox`);
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            if (allResults.length > 0) processData();
         }
 
         function processData() {
@@ -1500,7 +1629,7 @@
                         let url = '', traffic = 0, dr = 0, content = '';
                         let totalPages = 0, trafficValue = 0, avgRefDomains = 0;
 
-                                          // Extract data strictly based on CSV headers
+                        // Extract data strictly based on CSV headers
                         for (const key of Object.keys(row)) {
                             const lKey = key.toLowerCase().trim();
                             
