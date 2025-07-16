@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
      <script src="auth-guard.js"></script>
-    <script src="resource-protection.js"></script>
+    <!-- <script src="resource-protection.js"></script> -->
     <style>
         * {
             margin: 0;
@@ -527,13 +527,13 @@
         }
 
         /* Results Section */
-        .results-section {
+        /* .results-section {
             display: none;
         }
 
         .results-section.show {
             display: block;
-        }
+        } */
 
         .stats-grid {
             display: grid;
@@ -779,7 +779,9 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 1rem;
         }
-
+        .inner-logo{
+            margin-bottom: 10px;
+        }
         .btn-top-analyze {
             margin-top: 0;
         }
@@ -953,7 +955,10 @@
         <div class="main-layout">
             <!-- Sidebar -->
             <aside class="sidebar" id="sidebar">
-
+              <div class="logo inner-logo">
+                    <i class="fas fa-search"></i>
+                    <span>Ahrefs Niche Finder</span>
+                </div>
                 <!-- Upload Section -->
                 <div class="upload-area" id="uploadArea">
                     <i class="upload-icon fas fa-cloud-upload-alt"></i>
