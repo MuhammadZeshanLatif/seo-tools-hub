@@ -9,7 +9,7 @@
         ALLOWED_DOMAINS: [
             'localhost',
             '127.0.0.1',
-            'muhammadzeshanlatif.github.io/',
+            'muhammadzeshanlatif.github.io',
             // Add your domain here when deployed
             // 'yourdomain.com',
             // 'www.yourdomain.com'
