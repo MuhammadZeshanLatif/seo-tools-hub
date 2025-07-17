@@ -1,7 +1,7 @@
 // --- auth.js ---
 // Configuration
 const CONFIG = {
-    WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbxV3KwSQQFFeCpw0i7Z6EULi3cD0U8rsLIPQL79nSh7Xv_Iv881-DnZBa3xDguTbStL9w/exec',
+    WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbzmyY_bt8xpvR1W-odg997PN2KXDSD_pvH_uuXE1B1yEgiVmX58Jt7RNHMMyJ0Ndqwbjg/exec',
     SESSION_DURATION: 24 * 60 * 60 * 1000,
     STORAGE_KEY: 'seo_tools_auth'
 };
